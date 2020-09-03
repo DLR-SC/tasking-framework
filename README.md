@@ -93,7 +93,7 @@ If doxygen is installed the build target
 
 is available to generate HTML output in the build/doc/ folder.
 
-##How to contribute##
+## How to contribute ##
 The development of Tasking Framework is conducted internally. Releases will be mirrored to the external repository on GitHub. 
 
 However, you can use github to report bugs, suggest bug fixes, suggest features, etc. The development team will consider your report and contact you. 
