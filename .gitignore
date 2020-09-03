@@ -1,0 +1,18 @@
+# Build folder from Makefile
+build
+
+# Eclipse project files 
+.project
+.cproject
+.settings
+
+# QtCreator project files
+*.config
+*.creator
+*.creator.user
+*.files
+*.includes
+*.autosave
+
+# KDevelop files
+*.kdev4
