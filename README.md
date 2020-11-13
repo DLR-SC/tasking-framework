@@ -1,7 +1,7 @@
 # Tasking Framework #
 
 Tasking Framework is an event-driven multithreading execution platform and software development library.
-  It is dedicated to develop embedded software with static memory requirements as well as non-embedded software. Therefore, the applicability of Tasking Framework covers developing embedded software for illustrative case studies for educational purpose, prototypes, on-board software, etc.
+It is dedicated to develop embedded software with static memory requirements as well as non-embedded software. Therefore, the applicability of Tasking Framework covers developing embedded software for illustrative case studies for educational purpose, prototypes, on-board software, etc.  
 
 ## Copyrights ##
 Copyright 2012 German Aerospace Center (DLR) SC
@@ -28,6 +28,8 @@ We use the following libraries with their respective licenses:
 The framework was developed and tested on recent 64-Bit Linux systems. The 
 pthread library is needed.
 
+## Usage ##
+Tutorial in [Wiki](https://github.com/DLR-SC/tasking-framework/wiki).
 
 ## Build ##
 To build library in folder build/lib 
