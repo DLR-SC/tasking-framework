@@ -96,7 +96,7 @@ TEST_F(TestTaskEvent, NoCallAfterConstructing)
 TEST_F(TestTaskEvent, EventName)
 {
     ControlledEvent namedEvent(scheduler, "Jerk");
-    EXPECT_EQ(0x4A65726B, namedEvent.getChannelId());
+    EXPECT_EQ(0x4A65726Bu, namedEvent.getChannelId());
 }
 
 TEST_F(TestTaskEvent, triggerImmediately)

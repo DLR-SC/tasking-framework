@@ -36,8 +36,7 @@ public:
 
 Tasking::Task::Task(Scheduler& scheduler, SchedulePolicy::ManagementData& policy, InputArray& inputArray,
                     TaskId taskId) :
-    m_taskId(taskId),
-    impl(scheduler, policy, *this, inputArray)
+    m_taskId(taskId), impl(scheduler, policy, *this, inputArray)
 {
     static TaskId autoId = 1u;
     if (taskId == 0)

@@ -60,7 +60,7 @@ public:
      * Queue a task according to the policy into the run queue. An implementation of a scheduling policy must implement
      * this method. Each task provides the management data structure to provide the memory space for the scheduling
      * policy. The method is called when a task switches the state from wait to pending.
-     * @param Reference to the task to queue in the run queue by the scheduling policy
+     * @param task Reference to the task to queue in the run queue by the scheduling policy
      * @return True when queue was empty at call time.
      * @see ManagementData
      */

@@ -47,7 +47,7 @@ public:
 
     /**
      * Queue a task in LIFO order to the run queue
-     * @param Reference to the task to queue into the run queue.
+     * @param task Reference to the task to queue into the run queue.
      * @return True when queue is empty at call time.
      */
     bool queue(TaskImpl& task) override;

@@ -37,7 +37,7 @@ public:
     {
         /**
          * Initialize with a priority
-         * @param Priority of the task
+         * @param priority Priority of the task
          */
         explicit Settings(Priority priority);
 
@@ -65,7 +65,7 @@ public:
 
     /**
      * Queue a task by priority in to the run queue. For tasks with the same priority the order is FIFO.
-     * @param Reference to the task to queue in the run queue by its priority.
+     * @param task Reference to the task to queue in the run queue by its priority.
      * @return True when queue was empty at call time.
      */
     bool queue(TaskImpl& task) override;

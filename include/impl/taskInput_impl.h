@@ -19,20 +19,21 @@
 #ifndef INCLUDE_IMPL_TASKINPUT_IMPL_H_
 #define INCLUDE_IMPL_TASKINPUT_IMPL_H_
 
-
 // Standard integer definitions are needed to get UINTMAX_MAX
 #include <limits>
 
 #include <taskInput.h>
 
-namespace Tasking {
+namespace Tasking
+{
 
 class Input;
 class Channel;
 class Task;
 class TaskImpl;
 
-struct InputImpl {
+struct InputImpl
+{
 
     /**
      * Initialize the API part of the implementation.
@@ -45,15 +46,13 @@ struct InputImpl {
      * Getter method to access the task channel associated with this input
      * @result Pointer to the task channel associated with the this input
      */
-    Channel*
-    getChannel(void) const;
+    Channel* getChannel(void) const;
 
     /**
      * Call to notify an input. A call to this method can lead into an activation of the associated
      * task.
      */
-    void
-    notifyInput(void);
+    void notifyInput(void);
 
     /// Reference to the input implemented by the structure.
     Input& parent;
@@ -92,6 +91,6 @@ struct InputImpl {
     static const unsigned int uninitialized = std::numeric_limits<unsigned int>::max();
 };
 
-}  // namespace Tasking
+} // namespace Tasking
 
 #endif /* INCLUDE_IMPL_TASKINPUT_IMPL_H_ */

@@ -20,8 +20,7 @@
 #include "schedulerExecutionModel.h"
 
 Tasking::ClockExecutionModel::ClockExecutionModel(Scheduler& p_scheduler) :
-    Clock(p_scheduler),
-    m_timer(this, &ClockExecutionModel::clockTick, "TSKC")
+    Clock(p_scheduler), m_timer(this, &ClockExecutionModel::clockTick, "TSKC")
 {
     m_zeroTime = boardClock.now();
 }

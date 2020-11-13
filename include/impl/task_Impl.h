@@ -23,7 +23,8 @@
 #include "taskInputArray.h"
 #include <mutex.h>
 
-namespace Tasking {
+namespace Tasking
+{
 
 // Forward declarations
 class GroupImpl;
@@ -54,15 +55,13 @@ struct TaskImpl
      * Activate the task if all inputs of the task activated. The method is called by input array when all inputs are
      * activated. Don't call it from application code except you want unexpected behavior.
      */
-    void
-    activate();
+    void activate();
 
     /**
      * The method is called by the scheduler after synchronizationEnd is done and checks the connection to a task
      * group. If it is connected the finalization of the task is reported, if not the task is reset.
      */
-    void
-    finalizeExecution(void);
+    void finalizeExecution(void);
 
     /**
      * This method is called directly by the scheduler before the execution method is called. It loops over all inputs
@@ -70,8 +69,7 @@ struct TaskImpl
      *
      * @see Channel::synchronizeStart
      */
-    void
-    synchronizeStart(void);
+    void synchronizeStart(void);
 
     /**
      * This method is called by the scheduler directly after the execution methods end. It loops over all inputs to
@@ -79,16 +77,14 @@ struct TaskImpl
      *
      * @see Channel::synchronizeEnd
      */
-    void
-    synchronizeEnd(void);
+    void synchronizeEnd(void);
 
     /**
      * Request if the task was executed when it is part of a group
      *
      * @result True, if the task was executed since the last call of reset for a group, else it is false.
      */
-    bool
-    isExecuted(void) const;
+    bool isExecuted(void) const;
 
     /**
      * Enumeration for the different states of a task.
@@ -137,6 +133,6 @@ struct TaskImpl
     GroupImpl* group;
 };
 
-}
+} // namespace Tasking
 
 #endif /* INCLUDE_IMPL_TASK_IMPL_H_ */

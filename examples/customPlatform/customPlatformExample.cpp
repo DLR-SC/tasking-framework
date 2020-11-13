@@ -76,8 +76,7 @@ EchoChannel::getString(void) const
 // --------------------------
 
 EchoTask::EchoTask(Tasking::Scheduler& scheduler, std::string concatWord, EchoChannel& outChannel) :
-    TaskProvider(scheduler),
-    out(outChannel)
+    TaskProvider(scheduler), out(outChannel)
 {
     // Activate when one new string is available on both incoming channels.
     inputs[0].configure(1u);

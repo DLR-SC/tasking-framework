@@ -18,9 +18,10 @@
 .PHONY : help doc lib clean depend test install
 
 # Get platform specific sources for the scheduler
+# IS_NONE_PLATFORM is switch for unit test checks working only on platform none
 ifeq (none, $(platform))
 schedulerFolder = $(wildcard arch/none)
-CXXFLAGS += -Iarch/none
+CXXFLAGS += -Iarch/none -DIS_NONE_PLATFORM
 else
 ifeq (outpost, $(platform))
 schedulerFolder = $(wildcard arch/outpost)
@@ -61,7 +62,7 @@ help :
 	@echo "  depend  : Generate dependancies for source files without platform option as"
 	@echo "            Linux scheduler"
 	@echo "  lib     : Generates library without platform option as Linux scheduler"
-	@echo "            Call 'make clean' if you generate for a different platform"
+	@echo "            Call 'make clean' if you generate for a different platform."
 	@echo "  install : Generate the tasking directory with lib and include folder."
 	@echo "            Platform option is necessary if it is different from Linux."
 	@echo "  clean   : Remove the build folder"
@@ -101,23 +102,29 @@ depend: $(srcDependencies) $(schedulerDependencies)
 build/%.d: src/%.cpp | build
 	@$(CXX) -MM $(CXXFLAGS) $< > $@
 	@sed -i '1s/.*/build\/&/; $$s/.*/& | build/' $@
-	@echo "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
+	@echo -e "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
 	@sed -i '$$s/\.d/.o/' $@
 build/%.d: $(schedulerFolder)/%.cpp | build
 	@$(CXX) -MM $(CXXFLAGS) $< > $@
 	@sed -i '1s/.*/build\/&/; $$s/.*/& | build/' $@
-	@echo "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
+	@echo -e "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
 	@sed -i '$$s/\.d/.o/' $@
 	
-# Generate unit tests (gtest required)
-#test: build/testTasking
-#build/testTasking: lib $(testObjects) | build/test
-#	@echo "<<<< Generate unit tests >>>>"
-#	$(CXX) $(CFLAGS) $(CXXFLAGS) -Icontrib contrib/gtest/gtest-all.cc $(wildcard build/test/*.o) -Lbuild/lib -ltasking -lpthread -o build/tasking_test
-#	
-#build/test/%.o: test/%.cpp | build/test
-#	$(CXX) -c $(CFLAGS) $(CXXFLAGS) -Icontrib  $< -o $@
-
+# Generate unit tests (googletest required)
+GOOGLE_TEST_INCLUDE = -Icontrib/googletest/include
+test: build/testTasking
+build/testTasking: lib $(testObjects) build/test/gtest-all.o | build/test
+	@echo "<<<< Generate unit tests >>>>"
+	$(CXX) $(CFLAGS) $(CXXFLAGS) $(GOOGLE_TEST_INCLUDE) \
+		$(wildcard build/test/*.o) \
+		-Lbuild/lib -ltasking -lpthread -o build/tasking_test
+	
+build/test/%.o: test/%.cpp | build/test
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(GOOGLE_TEST_INCLUDE)  $< -o $@
+	
+build/test/gtest-all.o: contrib/googletest/src/gtest-all.cc | build/test
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(GOOGLE_TEST_INCLUDE) $< -o $@
+	
 # Generate documentation 
 doc : | build
 	@doxygen DoxyfileMake.in

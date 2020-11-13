@@ -20,7 +20,7 @@
 #define TASK_H_
 
 #include "impl/task_Impl.h"
-#include "taskTypes.h"
+#include "taskUtils.h"
 
 namespace Tasking
 {
@@ -315,8 +315,7 @@ TaskProvider<numberOfInputs, policy>::TaskProvider(Scheduler& _scheduler, TaskId
 template<unsigned int numberOfInputs, class policy>
 TaskProvider<numberOfInputs, policy>::TaskProvider(Scheduler& _scheduler, typename policy::Settings settings,
                                                    TaskId taskId) :
-    Task(_scheduler, policyData, inputs, taskId),
-    policyData(settings)
+    Task(_scheduler, policyData, inputs, taskId), policyData(settings)
 {
     Task::construct();
 }

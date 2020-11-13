@@ -59,7 +59,7 @@ protected:
      * @param n Number of tasks can bind to the task group. It is under response of the application programmer,
      *            that no more calls to bindTo happens than specified by this parameter.
      *
-     * @param taskList A list of task pointers
+     * @param p_taskList A list of task pointers
      */
     Group(unsigned int n, TaskImpl** p_taskList);
 

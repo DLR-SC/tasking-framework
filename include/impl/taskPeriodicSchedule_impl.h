@@ -21,7 +21,8 @@
 
 #include "../taskTypes.h"
 
-namespace Tasking {
+namespace Tasking
+{
 
 class PeriodicScheduleTrigger;
 
@@ -29,7 +30,8 @@ class PeriodicScheduleTrigger;
  * Implementation structure of an periodic schedule. This structure hold all data and
  * internal functions to process an periodic schedule.
  */
-struct PeriodicScheduleImpl {
+struct PeriodicScheduleImpl
+{
 
     /// Null initialization of periodic schedule
     PeriodicScheduleImpl(void);
@@ -67,6 +69,5 @@ struct PeriodicScheduleImpl {
 };
 
 } // namespace Tasking
-
 
 #endif /* INCLUDE_IMPL_TASKPERIODICSCHEDULE_IMPL_H_ */

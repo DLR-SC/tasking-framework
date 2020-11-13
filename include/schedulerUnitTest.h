@@ -35,7 +35,7 @@ public:
     /**
      * Initialization for unit tests
      *
-     * @param Reference to the used schedulePolicy.
+     * @param schedulePolicy Reference to the used schedulePolicy.
      */
     SchedulerUnitTest(SchedulePolicy& schedulePolicy);
 
@@ -78,7 +78,7 @@ protected:
 
         /**
          * Step forward in the simulated time.
-         * @param timeSpan Time step in milliseconds the clock is forwarded.
+         * @param span Time step in milliseconds the clock is forwarded.
          */
         void step(Tasking::Time span);
 

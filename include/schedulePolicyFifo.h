@@ -49,7 +49,7 @@ public:
 
     /**
      * Put a task at the tail of the FIFO queue.
-     * @param Reference to the task, which will queued in FIFO order to the run queue
+     * @param task Reference to the task, which will queued in FIFO order to the run queue
      * @return True when queue was empty at call
      */
     bool queue(TaskImpl& task) override;

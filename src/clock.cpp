@@ -27,10 +27,7 @@ public:
 };
 
 Tasking::Clock::Clock(Tasking::Scheduler& pScheduler) :
-    scheduler(pScheduler),
-    inTimeQueueMutex(false),
-    queueHead(NULL),
-    queueTail(NULL)
+    scheduler(pScheduler), inTimeQueueMutex(false), queueHead(NULL), queueTail(NULL)
 {
 }
 

@@ -22,9 +22,11 @@
 #include "taskInput.h"
 #include <cstddef>
 
-namespace Tasking {
+namespace Tasking
+{
 
-struct InputArrayImpl {
+struct InputArrayImpl
+{
     /**
      * Initialize the data of the input array. The constructor should only used with the overloaded template class
      * which provide the memory for the array.
@@ -39,8 +41,6 @@ struct InputArrayImpl {
     size_t length;
 };
 
-}  // namespace Tasking
-
-
+} // namespace Tasking
 
 #endif /* INCLUDE_IMPL_TASKINPUTARRAY_IMPL_H_ */

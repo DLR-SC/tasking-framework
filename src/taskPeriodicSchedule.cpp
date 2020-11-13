@@ -33,10 +33,7 @@ Tasking::PeriodicSchedule::add(Tasking::PeriodicScheduleTrigger& newTrigger)
 // ==========================
 
 Tasking::PeriodicScheduleImpl::PeriodicScheduleImpl(void) :
-    triggers(nullptr),
-    activeTrigger(nullptr),
-    startTimeOffPeriod_ms(0u),
-    period_ms(0u)
+    triggers(nullptr), activeTrigger(nullptr), startTimeOffPeriod_ms(0u), period_ms(0u)
 {
 }
 

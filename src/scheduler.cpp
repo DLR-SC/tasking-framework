@@ -102,11 +102,7 @@ Tasking::Scheduler::initialize(void)
 // ====================================
 
 Tasking::SchedulerImpl::SchedulerImpl(Scheduler& scheduler, SchedulePolicy& schedulePolicy, Clock& p_clock) :
-    parent(scheduler),
-    policy(schedulePolicy),
-    associatedTasks(NULL),
-    clock(p_clock),
-    running(false)
+    parent(scheduler), policy(schedulePolicy), associatedTasks(NULL), clock(p_clock), running(false)
 {
     // Nothing else to do
 }

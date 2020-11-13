@@ -21,9 +21,7 @@
 #include "clockExecutionModel.h"
 
 Tasking::ClockExecutionModel::ClockExecutionModel(Scheduler& _scheduler) :
-    Clock(_scheduler),
-    zeroTime(0u),
-    currentTime(0u)
+    Clock(_scheduler), zeroTime(0u), currentTime(0u)
 {
     // Nothing further to do for this implementation
 }

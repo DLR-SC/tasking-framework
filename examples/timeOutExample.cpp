@@ -120,9 +120,7 @@ private:
 
 HandleKeyboardInput::HandleKeyboardInput(Tasking::Scheduler& scheduler, OutputChannel& outChannel,
                                          Tasking::Event& outTime) :
-    TaskProvider(scheduler),
-    out(outChannel),
-    outTrigger(outTime)
+    TaskProvider(scheduler), out(outChannel), outTrigger(outTime)
 {
     // Trigger when data is received on the input channel
     inputs[0u].configure(1u);

@@ -26,7 +26,8 @@ Tasking::InputArray::InputArray(Input* inputMemory, size_t p_size) : impl(inputM
 
 //-------------------------------------
 
-const Tasking::Input& Tasking::InputArray::operator[](unsigned int index) const
+const Tasking::Input&
+Tasking::InputArray::operator[](unsigned int index) const
 {
     assert(index < impl.length);
     return impl.inputs[index];
@@ -34,7 +35,8 @@ const Tasking::Input& Tasking::InputArray::operator[](unsigned int index) const
 
 //-------------------------------------
 
-Tasking::Input& Tasking::InputArray::operator[](unsigned int index)
+Tasking::Input&
+Tasking::InputArray::operator[](unsigned int index)
 {
     assert(index < impl.length);
     return impl.inputs[index];

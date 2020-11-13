@@ -22,7 +22,8 @@
 #include "taskEvent.h"
 #include <mutex.h>
 
-namespace Tasking {
+namespace Tasking
+{
 
 class Scheduler;
 
@@ -33,7 +34,6 @@ class Scheduler;
 class Clock
 {
 public:
-
     /**
      * Initialization of the clock and connect it to scheduler
      *
@@ -66,8 +66,8 @@ public:
      * Start an event at an absolute time.
      *
      * @param p_event Reference to the event to start at an absolute time
-     * @param time Absolute time in ms when the event should started. Time zero depends on the bare metal implementation.
-     * By default it should be the instantiation time of this class.
+     * @param time Absolute time in ms when the event should started. Time zero depends on the bare metal
+     * implementation. By default it should be the instantiation time of this class.
      */
     void startAt(EventImpl& p_event, const Time time);
 
@@ -161,7 +161,6 @@ public:
      * event enqueued after.
      */
     EventImpl* queueTail;
-
 };
 
 } // namespace Tasking

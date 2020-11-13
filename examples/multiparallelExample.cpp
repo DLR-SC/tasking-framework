@@ -84,8 +84,7 @@ class ParallelTask : public Tasking::TaskProvider<1, Tasking::SchedulePolicyFifo
 {
 public:
     ParallelTask(Tasking::Scheduler& scheduler, Tasking::Barrier& barrier) :
-        TaskProvider(scheduler),
-        outBarrier(barrier)
+        TaskProvider(scheduler), outBarrier(barrier)
     {
         inputs[0].configure(1);
     }

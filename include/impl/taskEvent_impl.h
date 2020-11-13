@@ -23,7 +23,8 @@
 #include "../taskChannel.h"
 #include "../taskTypes.h"
 
-namespace Tasking {
+namespace Tasking
+{
 
 // Forward declaration for friend definition
 class Clock;
@@ -90,8 +91,7 @@ struct EventImpl
     /**
      * Task specific processing of the time event.
      */
-    void
-    handle(void);
+    void handle(void);
 
     /**
      * Configure the event to an periodic timing
@@ -102,15 +102,13 @@ struct EventImpl
      * computes the next time point in the future by adding a multiple of the period to the offset. In case the
      * period is zero, the event start immediately.
      */
-    void
-    configurePeriodicTiming(const Time period, const Time offset);
+    void configurePeriodicTiming(const Time period, const Time offset);
 
     /**
      * Setter method for periodic schedule.
-     * @param Reference to periodic schedule to set for the event.
+     * @param schedule Reference to periodic schedule to set for the event.
      */
-    void
-    setPeriodicSchedule(PeriodicSchedule& schedule);
+    void setPeriodicSchedule(PeriodicSchedule& schedule);
 };
 
 } // namespace Tasking

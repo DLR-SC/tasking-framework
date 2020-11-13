@@ -74,7 +74,7 @@ public:
     /**
      * Stopping the scheduling of tasks. The scheduler didn't accept tasks to perform until start is called.
      *
-     * @bool doNotRemovePendingTasks If the flag is set to false, after stop acceptance of task activations is stopped,
+     * @param doNotRemovePendingTasks If the flag is set to false, after stop acceptance of task activations is stopped,
      * pending tasks in the run queue are removed. Currently running tasks will not terminated by this call.
      *
      * @see start

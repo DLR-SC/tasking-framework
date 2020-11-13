@@ -19,6 +19,7 @@
 #include <taskEvent.h>
 #include <taskPeriodicSchedule.h>
 #include <taskChannel.h>
+#include <taskUtils.h>
 #include <scheduler.h>
 #include <impl/clock_impl.h>
 

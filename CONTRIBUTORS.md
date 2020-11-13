@@ -5,7 +5,5 @@
 	* Moritz Ulmer
 	* Ting Peng
 	* Jan Sommer
-	* Fabian Greif
 	* Zain Alabedin Haj Hammadeh
-	* Dennis Pfau
 	* Andreas Lund

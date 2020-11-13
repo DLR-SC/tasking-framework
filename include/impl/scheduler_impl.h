@@ -23,7 +23,8 @@
 #include "impl/clock_impl.h"
 #include <mutex.h>
 
-namespace Tasking {
+namespace Tasking
+{
 
 // Forward name declarations
 class TaskImpl;
@@ -48,8 +49,7 @@ struct SchedulerImpl
     /**
      * Adding a task to the internal list of associated tasks. This method is called by the constructor of the task.
      */
-    void
-    add(TaskImpl& task);
+    void add(TaskImpl& task);
 
     /**
      * Initiate the execution of the referenced task. By default the state of the task switch to pending by this call.
@@ -58,22 +58,19 @@ struct SchedulerImpl
      *
      * @param task Reference of the task, which execution should initiated.
      */
-    void
-    perform(TaskImpl& task);
+    void perform(TaskImpl& task);
 
     /**
      * Iterate over all pending events and execute them until no further event is pending. The method
      * should call by the scheduler implementation frequently.
      */
-    void
-    handleEvents(void);
+    void handleEvents(void);
 
     /**
      * Method which is called by the scheduler implementation to execute a task. The method embed the task
      * execution inside the synchronization call and finalize the task execution.
      */
-    void
-    execute(TaskImpl& task) const;
+    void execute(TaskImpl& task) const;
 
     /// Reference to scheduler which is implementation by this structure.
     Scheduler& parent;
@@ -81,7 +78,8 @@ struct SchedulerImpl
     /// Reference to the schedule policy used by the scheduler.
     SchedulePolicy& policy;
 
-    /// Pointer to the list of tasks associated to this scheduler. Activations of these tasks will handled by this scheduler.
+    /// Pointer to the list of tasks associated to this scheduler. Activations of these tasks will handled by this
+    /// scheduler.
     TaskImpl* associatedTasks;
 
     /// Reference to the clock used by the scheduler implementation.

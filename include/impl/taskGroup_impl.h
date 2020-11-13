@@ -19,7 +19,8 @@
 #ifndef INCLUDE_IMPLGROUP_H_
 #define INCLUDE_IMPLGROUP_H_
 
-namespace Tasking {
+namespace Tasking
+{
 
 class Task;
 class TaskImpl;
@@ -36,7 +37,7 @@ struct GroupImpl
      * @param n Number of tasks can bind to the task set. It is under response of the application programmer
      *            that no more calls to bindTo happens than specified by this parameter.
      *
-     * @param taskList A list of task pointers
+     * @param p_taskList A list of task pointers
      */
     GroupImpl(unsigned int n, TaskImpl** p_taskList);
 
@@ -45,22 +46,19 @@ struct GroupImpl
      *
      * @result true, if all tasks in the task list are executed since last reset operation.
      */
-    bool
-    areAllExecuted(void) const;
+    bool areAllExecuted(void) const;
 
     /**
      * Reset all associated tasks. Activated but not yet started threads will not started after that call. It is
      * recommended to call reset from application code. To reset all joined tasks, it is recommended to do this with
      * the respective schedulers.
      */
-    void
-    reset(void);
+    void reset(void);
 
     /**
      * The method is called by the scheduler when all tasks in the group has finalized.
      */
-    void
-    finalizeExecution(void);
+    void finalizeExecution(void);
 
     /**
      * List of associated tasks. Use join to associate tasks.

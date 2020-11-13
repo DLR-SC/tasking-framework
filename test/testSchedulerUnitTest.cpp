@@ -243,9 +243,9 @@ TEST_F(TestSchedulerUnitTest, terminateWithoutCleanUp)
     msg[1].push();
     scheduler.terminate(true);
     scheduler.schedule();
-    EXPECT_EQ(1u, checker.calls);
-    EXPECT_EQ(2u, msg[0].resets);
-    EXPECT_EQ(2u, msg[0].resets);
+    EXPECT_EQ(1, checker.calls);
+    EXPECT_EQ(2, msg[0].resets);
+    EXPECT_EQ(2, msg[0].resets);
 }
 
 TEST_F(TestSchedulerUnitTest, handleEvent)
@@ -259,7 +259,7 @@ TEST_F(TestSchedulerUnitTest, handleEvent)
     channel.push();
     event.trigger(); // Both inputs are activated now
     scheduler.schedule();
-    EXPECT_EQ(1u, timeTriggeredTask.calls);
+    EXPECT_EQ(1, timeTriggeredTask.calls);
 }
 
 TEST_F(TestSchedulerUnitTest, stepOverTime)
@@ -273,8 +273,8 @@ TEST_F(TestSchedulerUnitTest, stepOverTime)
     channel.push();
     event.trigger(1);
     scheduler.schedule();
-    EXPECT_EQ(0u, timeTriggeredTask.calls);
+    EXPECT_EQ(0, timeTriggeredTask.calls);
     // Step one ms ahead
     scheduler.schedule(1u);
-    EXPECT_EQ(1u, timeTriggeredTask.calls);
+    EXPECT_EQ(1, timeTriggeredTask.calls);
 }

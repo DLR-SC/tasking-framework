@@ -86,12 +86,7 @@ executorThread(void* management)
 // ================
 
 Tasking::SchedulerExecutionModel::Executor::Executor(void) :
-    thread(0u),
-    schedulerModel(nullptr),
-    schedulerImpl(nullptr),
-    running(false),
-    waitOnSignal(false),
-    nextFree(nullptr)
+    thread(0u), schedulerModel(nullptr), schedulerImpl(nullptr), running(false), waitOnSignal(false), nextFree(nullptr)
 {
 }
 

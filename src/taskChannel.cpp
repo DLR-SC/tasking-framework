@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-#include "taskChannel.h"
-#include "taskInput.h"
+#include <taskChannel.h>
+#include <taskInput.h>
+#include <taskUtils.h>
 
 Tasking::Channel::Channel(ChannelId channelId) : m_channelId(channelId), m_inputs(nullptr)
 {

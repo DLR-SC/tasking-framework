@@ -36,50 +36,8 @@ static const Time endOfTime = std::numeric_limits<Time>::max();
 /// Type to express the task ID.
 typedef uint32_t TaskId;
 
-/**
- * Convert a name into a task identification.
- * @param name String with the name to convert.
- * @result TaskId computed from the name.
- */
-TaskId getTaskIdFromName(const char* name);
-
-/**
- * Convert a task identification to a name.
- * @param id Task identification to convert.
- * @param buffer Pointer to buffer to hold the resulting task name.
- * @param length Size of the buffer for task name. Optional and buffer size is assumed with five bytes. For buffer
- * with less than five bytes it is mandatory to set the value. The resulting string is shorten to the length.
- * @return Pointer to the name of the task with the corresponding identification. Pointer is identical to @ref buffer.
- */
-char* convertTaskIdToString(TaskId id, char* buffer, size_t length = 5);
-
 /// Type to express the channel ID.
 typedef uint32_t ChannelId;
-
-/**
- * Convert a name into a task identification.
- * @param name String with the name to convert.
- * @result TaskId computed from the name.
- */
-inline ChannelId
-getChannelIdFromName(const char* name)
-{
-    return static_cast<ChannelId>(getTaskIdFromName(name));
-}
-
-/**
- * Convert a channel id to a name.
- * @param id Task identification to convert.
- * @param buffer Pointer to buffer to hold the resulting task name.
- * @param length Size of the buffer for task name. Optional and buffer size is assumed with five bytes.For buffer
- * with less than five bytes it is mandatory to set the value. The resulting string is shorten to the length.
- * @return Pointer to the name of the task with the corresponding identification. Pointer is identical to @ref buffer.
- */
-inline char*
-convertChannelIdToString(ChannelId id, char* buffer, size_t length = 5)
-{
-    return convertTaskIdToString(static_cast<TaskId>(id), buffer, length);
-}
 
 } // namespace Tasking
 

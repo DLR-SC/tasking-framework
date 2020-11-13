@@ -19,8 +19,7 @@
 #include <schedulerUnitTest.h>
 
 Tasking::SchedulerUnitTest::SchedulerUnitTest(SchedulePolicy& schedulePolicy) :
-    Scheduler(schedulePolicy, unitTestclock),
-    unitTestclock(*this)
+    Scheduler(schedulePolicy, unitTestclock), unitTestclock(*this)
 {
 }
 
