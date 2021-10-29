@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY : help doc lib clean depend test install
+.PHONY : help doc lib clean depend test install examples
 
 # Get platform specific sources for the scheduler
 # IS_NONE_PLATFORM is switch for unit test checks working only on platform none
@@ -147,6 +147,9 @@ build/tasking: | build
 
 build:
 	@mkdir build
+
+examples:
+	@$(MAKE) -C examples all
 	
 -include $(srcDependencies) $(schedulerDependencies)
 	
