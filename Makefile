@@ -149,7 +149,7 @@ build:
 	@mkdir build
 
 examples:
-	$(MAKE) -C examples all
+	@$(MAKE) -C examples all
 	
 -include $(srcDependencies) $(schedulerDependencies)
 	
