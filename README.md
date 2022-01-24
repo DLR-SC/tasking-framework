@@ -21,8 +21,8 @@ limitations under the License.
 ### External Libraries ###
 We use the following libraries with their respective licenses: 
 
-  - contrib/gtest: *BSD 3-Clause*
-  - contrib/outpost-core: *Mozilla Public License, v. 2.0*.
+  - contrib/gtest: *BSD 3-Clause* (Only unit tests)
+  - contrib/outpost-core: *Mozilla Public License, v. 2.0*. (Only platform outpost)
   
 ## Prerequisites ##
 The framework was developed and tested on recent 64-Bit Linux systems. The 
