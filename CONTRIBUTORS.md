@@ -3,7 +3,7 @@
 	* Olaf Maibaum
  	* Daniel Lüdtke
  	* Moritz Ulmer
- 	* Ting Pen
+ 	* Ting Peng
 	* Jan Sommer
 	* Fabian Greif
 	* Zain Alabedin Haj Hammadeh
