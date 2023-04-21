@@ -17,47 +17,8 @@
  */
 
 #include <taskUtils.h>
-#include <mutex.h>
-
-Tasking::TaskId
-Tasking::getTaskIdFromName(const char* name)
-{
-    TaskId id = 0u;
-    if (name != NULL)
-    {
-        // Copy the new task name. It can be at most 4 characters long
-        // and is assumed to be null-terminated
-        size_t i = 0u;
-        while ((i < 4u) && (name[i] != '\0'))
-        {
-            id = (id << 8u) + static_cast<unsigned int>(name[i]);
-            ++i;
-        }
-        id = id << (8u * (4u - i));
-    }
-    return id;
-}
-
-// ------------------------------------
-
-char*
-Tasking::convertTaskIdToString(TaskId id, char* buffer, size_t length)
-{
-    if ((length > 1) && (buffer != NULL))
-    {
-        // Loop when we are inside the buffer length (excluding null termination) and not all bits converted
-        for (unsigned int pos = 0u, shift = 32u; (pos < length - 1) && (shift > 0u); ++pos)
-        {
-            shift -= 8u; // Reduce shift first, so end check on bigger than zero becomes possible
-            buffer[pos] = (id >> shift) & 0xFFu;
-        }
-        // Minimum between length-1 and 4 is the null termination. If name has fewer characters the lower bits are 0.
-        buffer[(length > 5) ? 4 : length - 1] = 0;
-    }
-    return buffer;
-}
-
-// ====================================
+#include <task.h>
+#include <taskChannel.h>
 
 Tasking::MutexGuard::MutexGuard(Tasking::Mutex& inMutex) : mutex(inMutex)
 {
@@ -69,4 +30,18 @@ Tasking::MutexGuard::MutexGuard(Tasking::Mutex& inMutex) : mutex(inMutex)
 Tasking::MutexGuard::~MutexGuard()
 {
     mutex.leave();
+}
+
+// ====================================
+
+Tasking::IdConverter::IdConverter(const Tasking::Channel& channel)
+{
+    convertIdentificationToString<ChannelId>(channel.getChannelId(), name, sizeof(ChannelId) + 1u);
+}
+
+// ------------------------------------
+
+Tasking::IdConverter::IdConverter(const Tasking::Task& task)
+{
+    convertIdentificationToString<TaskId>(task.getTaskId(), name, sizeof(TaskId) + 1u);
 }

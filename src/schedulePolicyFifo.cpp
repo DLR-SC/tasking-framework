@@ -16,18 +16,16 @@
  * limitations under the License.
  */
 
-#include <cstddef>
-
 #include <schedulePolicyFifo.h>
 #include <task.h>
 
-Tasking::SchedulePolicyFifo::ManagementData::ManagementData(void) : next(NULL)
+Tasking::SchedulePolicyFifo::ManagementData::ManagementData(void) : next(nullptr)
 {
 }
 
 // ----------------
 
-Tasking::SchedulePolicyFifo::SchedulePolicyFifo(void) : head(NULL), tail(NULL)
+Tasking::SchedulePolicyFifo::SchedulePolicyFifo(void) : head(nullptr), tail(nullptr)
 {
 }
 
@@ -36,13 +34,13 @@ Tasking::SchedulePolicyFifo::SchedulePolicyFifo(void) : head(NULL), tail(NULL)
 bool
 Tasking::SchedulePolicyFifo::queue(Tasking::TaskImpl& task)
 {
-    // Next element of enqueued task is always null
-    static_cast<ManagementData*>(task.policyData)->next = NULL;
+    // Next element of enqueued task is always nullptr
+    static_cast<ManagementData*>(task.policyData)->next = nullptr;
 
     queueMutex.enter();
 
     // Check if state is empty
-    bool isEmpty = (head == NULL);
+    bool isEmpty = (head == nullptr);
     if (isEmpty)
     { // When it is empty, than head should adjusted to new task
         head = &task;
@@ -67,13 +65,13 @@ Tasking::SchedulePolicyFifo::nextTask(void)
 
     // Get head element and correct it
     TaskImpl* next = head;
-    if (head != NULL)
+    if (head != nullptr)
     {
         head = static_cast<ManagementData*>(head->policyData)->next;
         // When the FIFO becomes empty, tail must invalidated
-        if (head == NULL)
+        if (head == nullptr)
         {
-            tail = NULL;
+            tail = nullptr;
         }
     }
 

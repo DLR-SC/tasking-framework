@@ -19,6 +19,8 @@
 #ifndef TASKING_INCLUDE_SCHEDULERPROVIDER_H_
 #define TASKING_INCLUDE_SCHEDULERPROVIDER_H_
 
+#include <type_traits>
+
 #include "schedulerExecutionModel.h"
 
 namespace Tasking
@@ -27,10 +29,10 @@ namespace Tasking
 /**
  * Template to instantiate a scheduler with all needed elements.
  * @tparam tp_numberOfExecutors Number of instantiated and started executors for the scheduler.
- * @tparam SchedulerPolicy Type name of the selected scheduling policy. All tasks associated to
+ * @tparam SchedulePolicyType Type name of the selected scheduling policy. All tasks associated to
  * this scheduler should follow the same scheduling policy.
  */
-template<unsigned int tp_numberOfExecutors, typename SchedulerPolicy>
+template<size_t tp_numberOfExecutors, typename SchedulePolicyType>
 class SchedulerProvider : public SchedulerExecutionModel
 {
 public:
@@ -39,7 +41,7 @@ public:
 
 protected:
     /// Instance of the policy to manage the run queue
-    SchedulerPolicy policy;
+    SchedulePolicyType policy;
 
     /// Pool of executors
     SchedulerExecutionModel::Executor executors[tp_numberOfExecutors];
@@ -54,10 +56,13 @@ private:
 
 // ----------- inlines -----------
 
-template<unsigned int tp_numberOfExecutors, typename SchedulerPolicy>
-inline Tasking::SchedulerProvider<tp_numberOfExecutors, SchedulerPolicy>::SchedulerProvider(void) :
+template<size_t tp_numberOfExecutors, typename SchedulePolicyType>
+inline Tasking::SchedulerProvider<tp_numberOfExecutors, SchedulePolicyType>::SchedulerProvider(void) :
     SchedulerExecutionModel(policy, executors, tp_numberOfExecutors)
 {
+    static_assert(std::is_base_of<SchedulePolicy, SchedulePolicyType>::value,
+                  "Schedule policy type shall be derived from Tasking::SchedulePolicy");
+
     // By limitations for array parameters and the order of the constructors
     // the executor can not start before without uninitialized data.
     startExecutors();

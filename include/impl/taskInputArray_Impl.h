@@ -19,8 +19,7 @@
 #ifndef INCLUDE_IMPL_TASKINPUTARRAY_IMPL_H_
 #define INCLUDE_IMPL_TASKINPUTARRAY_IMPL_H_
 
-#include "taskInput.h"
-#include <cstddef>
+#include "../taskInput.h"
 
 namespace Tasking
 {

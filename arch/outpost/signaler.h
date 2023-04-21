@@ -20,13 +20,13 @@
 #define TASKING_INCLUDE_ARCH_OUTPOST_SIGNALER_H_
 
 #include <outpost/rtos/semaphore.h>
-#include "mutex.h"
+#include "mutexImpl.h"
 
 namespace Tasking
 {
 
 /// Implementation of a signaler on base of outpost mutex variables
-class Signaler : public Mutex
+class Signaler : public MutexImpl
 {
 public:
     /// Lock the blocking semaphore at instantiation

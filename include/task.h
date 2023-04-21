@@ -19,6 +19,8 @@
 #ifndef TASK_H_
 #define TASK_H_
 
+#include <type_traits>
+
 #include "impl/task_Impl.h"
 #include "taskUtils.h"
 
@@ -224,9 +226,9 @@ private:
  *
  * @tparam numberOfInputs Number of inputs for the task
  *
- * @tparam Policy Scheduling policy type
+ * @tparam SchedulePolicyType Scheduling policy type
  */
-template<unsigned int numberOfInputs, class Policy>
+template<unsigned int numberOfInputs, class SchedulePolicyType>
 class TaskProvider : public Task
 {
 public:
@@ -244,7 +246,7 @@ public:
     TaskProvider(Scheduler& scheduler, TaskId taskId = 0u);
 
     /**
-     * Constructor for a task with identification number and a scheduling policy with settings.
+     * Constructor for a task with identification number and a scheduling schedule policy with settings.
      *
      * @param scheduler Reference to the scheduler which performs this task.
      *
@@ -256,7 +258,7 @@ public:
      *    It is the responsibility of the user to ensure uniqueness of the task id.
      * @see taskId_t
      */
-    TaskProvider(Scheduler& scheduler, typename Policy::Settings settings, TaskId taskId = 0u);
+    TaskProvider(Scheduler& scheduler, typename SchedulePolicyType::Settings settings, TaskId taskId = 0u);
 
     /**
      * Constructor for a task with a name.
@@ -284,14 +286,15 @@ public:
      *                    truncated after 4 characters. Only a name _or_ a taskId can be used for
      *                    channel identification.
      */
-    TaskProvider(Scheduler& scheduler, typename Policy::Settings settings, const char* taskName);
+    TaskProvider(Scheduler& scheduler, typename SchedulePolicyType::Settings settings, const char* taskName);
 
 protected:
     /// Inputs of the task
     InputArrayProvider<numberOfInputs> inputs;
 
-    /// Policy data of the task.
-    typename Policy::ManagementData policyData; // Typename is needed to see the management data of the specified policy
+    /// Scheduling policy data of the task.
+    typename SchedulePolicyType::ManagementData policyData; // Typename is needed to see the management data of the
+                                                            // specified scheduling  policy
 };
 
 // ========= implementation part ==========
@@ -300,37 +303,51 @@ template<typename channelType>
 channelType*
 Task::getChannel(unsigned int key) const
 {
+    static_assert(std::is_base_of<Tasking::Channel, channelType>::value,
+                  "channelType needs to be derived from Tasking::Channel");
+
     return impl.inputs[key].getChannel<channelType>();
 }
 
 // ----------------
 
-template<unsigned int numberOfInputs, class policy>
-TaskProvider<numberOfInputs, policy>::TaskProvider(Scheduler& _scheduler, TaskId taskId) :
+template<unsigned int numberOfInputs, class SchedulePolicyType>
+TaskProvider<numberOfInputs, SchedulePolicyType>::TaskProvider(Scheduler& _scheduler, TaskId taskId) :
     Task(_scheduler, policyData, inputs, taskId)
 {
+    static_assert(std::is_base_of<SchedulePolicy, SchedulePolicyType>::value,
+                  "SchedulePolicyType needs to be derived from Tasking::SchedulePolicy");
     Task::construct();
 }
 
-template<unsigned int numberOfInputs, class policy>
-TaskProvider<numberOfInputs, policy>::TaskProvider(Scheduler& _scheduler, typename policy::Settings settings,
-                                                   TaskId taskId) :
+template<unsigned int numberOfInputs, class SchedulePolicyType>
+TaskProvider<numberOfInputs, SchedulePolicyType>::TaskProvider(Scheduler& _scheduler,
+                                                               typename SchedulePolicyType::Settings settings,
+                                                               TaskId taskId) :
     Task(_scheduler, policyData, inputs, taskId), policyData(settings)
 {
+    static_assert(std::is_base_of<SchedulePolicy, SchedulePolicyType>::value,
+                  "SchedulePolicyType needs to be derived from Tasking::SchedulePolicy");
+
     Task::construct();
 }
 
-template<unsigned int numberOfInputs, class policy>
-TaskProvider<numberOfInputs, policy>::TaskProvider(Scheduler& _scheduler, const char* taskName) :
+template<unsigned int numberOfInputs, class SchedulePolicyType>
+TaskProvider<numberOfInputs, SchedulePolicyType>::TaskProvider(Scheduler& _scheduler, const char* taskName) :
     TaskProvider(_scheduler, getTaskIdFromName(taskName))
 {
+    static_assert(std::is_base_of<SchedulePolicy, SchedulePolicyType>::value,
+                  "SchedulePolicyType needs to be derived from Tasking::SchedulePolicy");
 }
 
-template<unsigned int numberOfInputs, class policy>
-TaskProvider<numberOfInputs, policy>::TaskProvider(Scheduler& _scheduler, typename policy::Settings settings,
-                                                   const char* taskName) :
+template<unsigned int numberOfInputs, class SchedulePolicyType>
+TaskProvider<numberOfInputs, SchedulePolicyType>::TaskProvider(Scheduler& _scheduler,
+                                                               typename SchedulePolicyType::Settings settings,
+                                                               const char* taskName) :
     TaskProvider(_scheduler, settings, getTaskIdFromName(taskName))
 {
+    static_assert(std::is_base_of<SchedulePolicy, SchedulePolicyType>::value,
+                  "SchedulePolicyType needs to be derived from Tasking::SchedulePolicy");
 }
 
 } // namespace Tasking

@@ -17,10 +17,38 @@
  */
 
 #include <gtest/gtest.h>
+#include <string.h> // For memcmp
+
 #include <taskUtils.h>
+#include <task.h>
+#include <taskChannel.h>
+#include <schedulerUnitTest.h>
+#include <schedulePolicyFifo.h>
+
+class TestUtils : public ::testing::Test
+{
+public:
+    // Provide class with execute method.
+    class TestTask : public Tasking::TaskProvider<1, Tasking::SchedulePolicyFifo>
+    {
+    public:
+        TestTask(const char* name) :
+            Tasking::TaskProvider<1, Tasking::SchedulePolicyFifo>(scheduler, name), scheduler(policy)
+        {
+        }
+        void
+        execute(void) override
+        {
+        }
+
+    private:
+        Tasking::SchedulePolicyFifo policy;
+        Tasking::SchedulerUnitTest scheduler;
+    };
+};
 
 // Test works only if PLATFORM is none
-TEST(TestUtils, MutexGuard)
+TEST_F(TestUtils, MutexGuard)
 {
     class TestMutex : public Tasking::Mutex
     {
@@ -42,4 +70,19 @@ TEST(TestUtils, MutexGuard)
 #else
     EXPECT_TRUE(true);
 #endif
+}
+
+TEST_F(TestUtils, convertTaskId)
+{
+    const char* name = "Huge";
+    TestTask task(name);
+    EXPECT_TRUE(0 == memcmp(name, Tasking::IdConverter(task).name, 5));
+}
+
+TEST_F(TestUtils, convertChannelId)
+{
+    // Create a channel
+    const char* name = "Well";
+    Tasking::Channel channel(name);
+    EXPECT_TRUE(0 == memcmp(name, Tasking::IdConverter(channel).name, 5));
 }

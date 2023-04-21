@@ -20,7 +20,7 @@
 #define TASKING_INCLUDE_SCHEDULEPOLICYLIFO_H_
 
 #include "schedulePolicy.h"
-#include <mutex.h>
+#include "taskUtils.h"
 
 namespace Tasking
 {

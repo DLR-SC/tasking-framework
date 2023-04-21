@@ -33,7 +33,7 @@ Tasking::Channel::Channel(ChannelId channelId) : m_channelId(channelId), m_input
 
 //-------------------------------------
 
-Tasking::Channel::Channel(const char* channelName) : m_channelId(getChannelIdFromName(channelName)), m_inputs(NULL)
+Tasking::Channel::Channel(const char* channelName) : m_channelId(getChannelIdFromName(channelName)), m_inputs(nullptr)
 {
 }
 
@@ -98,7 +98,7 @@ Tasking::Channel::deassociate(Tasking::InputImpl& p_input)
 void
 Tasking::Channel::push(void)
 {
-    for (InputImpl* i = m_inputs; i != NULL; i = i->channelNextInput)
+    for (InputImpl* i = m_inputs; i != nullptr; i = i->channelNextInput)
     {
         i->notifyInput();
     }

@@ -33,9 +33,7 @@
 class TestSchedulerUnitTest : public ::testing::Test
 {
 public:
-
-    TestSchedulerUnitTest(void) :
-                    scheduler(policy), checker(scheduler)
+    TestSchedulerUnitTest(void) : scheduler(policy), checker(scheduler)
     {
         // input 1 is not used in every test case, don't add it here. Add it in test case
         checker.configureInput(0, msg[0]);
@@ -49,24 +47,26 @@ public:
     class CheckChannel : public Tasking::Channel
     {
     public:
-        CheckChannel(void) :
-                        Channel(1), resets(0), startsynchTask(NULL), synchActivations(0), endsynchTask(NULL)
+        CheckChannel(void) : Channel(1), resets(0), startsynchTask(nullptr), synchActivations(0), endsynchTask(nullptr)
         {
             // Nothing else to do.
         }
 
         using Tasking::Channel::push;
 
-        virtual void reset(void)
+        virtual void
+        reset(void)
         {
             ++resets;
         }
-        void synchronizeStart(const Tasking::Task* task, unsigned int activations) override
+        void
+        synchronizeStart(const Tasking::Task* task, unsigned int activations) override
         {
             startsynchTask = task;
             synchActivations = activations;
         }
-        virtual void synchronizeEnd(Tasking::Task* task)
+        virtual void
+        synchronizeEnd(Tasking::Task* task)
         {
             endsynchTask = task;
         }
@@ -81,7 +81,7 @@ public:
     {
     public:
         CheckTask(Tasking::Scheduler& scheduler, const Tasking::TaskId id = 0u) :
-                        TaskProvider(scheduler, id), calls(0), resets(0), initializations(0)
+            TaskProvider(scheduler, id), calls(0), resets(0), initializations(0)
         {
             // Configure input settings
             inputs[0].configure(1u);
@@ -89,18 +89,21 @@ public:
         }
 
         /// Overload execute to count executions
-        virtual void execute(void)
+        virtual void
+        execute(void)
         {
             calls++;
         }
         /// Count reset calls
-        virtual void reset(void)
+        virtual void
+        reset(void)
         {
             resets++;
             Task::reset();
         }
         /// Count reset operations
-        virtual void initialize(void)
+        virtual void
+        initialize(void)
         {
             initializations++;
             Task::initialize();

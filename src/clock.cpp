@@ -27,7 +27,12 @@ public:
 };
 
 Tasking::Clock::Clock(Tasking::Scheduler& pScheduler) :
-    scheduler(pScheduler), inTimeQueueMutex(false), queueHead(NULL), queueTail(NULL)
+    scheduler(pScheduler),
+    inTimeQueueMutex(false),
+    nextInQueueModified(false),
+    queueHead(nullptr),
+    queueTail(nullptr),
+    nonePendingHead(nullptr)
 {
 }
 
@@ -150,12 +155,12 @@ Tasking::Clock::enqueue(EventImpl& event)
     bool headReplaced = false;
 
     event.queued = true;
-    if (queueHead == NULL)
+    event.next = nullptr;
+    if (queueHead == nullptr)
     {
         // Nothing in the queue
         headReplaced = true;
-        event.next = NULL;
-        event.previous = NULL;
+        event.previous = nullptr;
         queueHead = &event;
         queueTail = &event;
     }
@@ -164,26 +169,31 @@ Tasking::Clock::enqueue(EventImpl& event)
         // Search position in the queue
         EventImpl* previousEvent = queueTail;
         // Queue is ordered by time all and we should found an element with smaller or equal time than the new element
-        while ((previousEvent != NULL) && (previousEvent->nextActivation_ms > event.nextActivation_ms))
+        while ((previousEvent != nullptr) && (previousEvent->nextActivation_ms > event.nextActivation_ms))
         {
             // Continue search with next previous time
             previousEvent = previousEvent->previous;
         }
         // Place in queue is found, element start time is smaller or equal to new element.
         // Is it the head element
-        if (previousEvent == NULL)
+        if (previousEvent == nullptr)
         {
             // Replace head because we found the first element in the queue. All other times in queue are in the future
             headReplaced = true;
-            // All elements at the head with the same tinme has at previous a nil pointer
-            for (EventImpl* hasSameTime = queueHead; (hasSameTime != NULL) && (hasSameTime->previous == NULL);
+            // All elements at the head with the same time has at previous a nil pointer
+            for (EventImpl* hasSameTime = queueHead; (hasSameTime != nullptr) && (hasSameTime->previous == nullptr);
                  hasSameTime = hasSameTime->next)
             {
                 hasSameTime->previous = &event;
             }
             event.next = queueHead;
-            event.previous = NULL;
+            event.previous = nullptr;
             queueHead = &event;
+            // When none pending event is set it need to be corrected
+            if (nonePendingHead != nullptr)
+            {
+                nonePendingHead = queueHead;
+            }
         }
         else
         {
@@ -200,8 +210,14 @@ Tasking::Clock::enqueue(EventImpl& event)
             // We now are between the found element and its next element
             event.next = previousEvent->next;
             previousEvent->next = &event;
+            nextInQueueModified = true;
+            // Check if none pending event is the next one it has to be corrected
+            if (event.next == nonePendingHead)
+            {
+                nonePendingHead = &event;
+            }
             // If we found the last element in the queue we become the tail of the queue
-            if (event.next == NULL)
+            if (event.next == nullptr)
             {
                 // Tail of queue
                 queueTail = &event;
@@ -211,7 +227,7 @@ Tasking::Clock::enqueue(EventImpl& event)
                 // If not tail, the previous pointer should correct for all following elements with the same time
                 Time nextTime = event.next->nextActivation_ms;
                 for (EventImpl* correctPrevious = event.next;
-                     (correctPrevious != NULL) && (correctPrevious->nextActivation_ms == nextTime); //
+                     (correctPrevious != nullptr) && (correctPrevious->nextActivation_ms == nextTime); //
                      correctPrevious = correctPrevious->next)
                 {
                     correctPrevious->previous = &event;
@@ -230,14 +246,14 @@ Tasking::Clock::enqueueHead(Tasking::EventImpl& event)
     // Only called by startAt or startIn, so always inside protected area of timeQueueMutex
 
     // If queue is not empty prepare head elements for enqueuing
-    if (queueHead != NULL)
+    if (queueHead != nullptr)
     {
         // If not start at the same time like the current head, than replace the previous pointer of block with same
         // start time
         if (event.nextActivation_ms < queueHead->nextActivation_ms)
         {
             for (EventImpl* queue = queueHead;
-                 (queue != NULL) && (queue->nextActivation_ms == queueHead->nextActivation_ms); queue = queue->next)
+                 (queue != nullptr) && (queue->nextActivation_ms == queueHead->nextActivation_ms); queue = queue->next)
             {
                 queue->previous = &event;
             }
@@ -245,7 +261,7 @@ Tasking::Clock::enqueueHead(Tasking::EventImpl& event)
     }
     // Prepare next and previous pointer of event to become new head element
     event.next = queueHead;
-    event.previous = NULL;
+    event.previous = nullptr;
     // Replace head element
     queueHead = &event;
 }
@@ -255,20 +271,24 @@ Tasking::Clock::enqueueHead(Tasking::EventImpl& event)
 void
 Tasking::Clock::dequeueAll(void)
 {
+    // No further event will fire so none pending head will not valid anymore
+    nonePendingHead = nullptr;
+
     timeQueueMutex.enter();
     // Reset pointers of all events in queue
     EventImpl* event = queueHead;
-    while (event != NULL)
+    while (event != nullptr)
     {
         EventImpl* next = event->next;
         event->queued = false;
-        event->next = NULL;
-        event->previous = NULL;
+        event->next = nullptr;
+        nextInQueueModified = true;
+        event->previous = nullptr;
         event = next;
     }
     // Clear head and tail
-    queueHead = NULL;
-    queueTail = NULL;
+    queueHead = nullptr;
+    queueTail = nullptr;
     timeQueueMutex.leave();
 }
 
@@ -277,6 +297,12 @@ Tasking::Clock::dequeueAll(void)
 void
 Tasking::Clock::dequeue(Tasking::EventImpl& event)
 {
+    // If element is the first none pending event the hone pending head need replaced
+    if (&event == nonePendingHead)
+    {
+        nonePendingHead = event.next;
+    }
+
     // Flag to indicate if mutex was entered by this method
     bool enterMutex = false;
 
@@ -291,18 +317,18 @@ Tasking::Clock::dequeue(Tasking::EventImpl& event)
     timeQueueMutexMutex.leave();
 
     // If event queue is empty, do nothing
-    if (queueHead != NULL)
+    if (queueHead != nullptr)
     {
         // Find the element in the queue and it direct previous element
         EventImpl* current = queueHead;
-        EventImpl* previous = NULL;
-        while ((current != NULL) && (&event != current))
+        EventImpl* previous = nullptr;
+        while ((current != nullptr) && (&event != current))
         {
             previous = current;
             current = current->next;
         }
         // Event is found in queue, so modify previous and next in queue
-        if (current != NULL)
+        if (current != nullptr)
         {
             // Distinguish four cases. Element to remove is head, tail, head and tail, or inside queue
             if (current == queueTail)
@@ -311,14 +337,14 @@ Tasking::Clock::dequeue(Tasking::EventImpl& event)
                 if (current == queueHead)
                 {
                     // Current is head and tail
-                    queueHead = NULL;
-                    queueTail = NULL;
+                    queueHead = nullptr;
+                    queueTail = nullptr;
                 }
                 else
                 {
                     // Current is only tail
-                    queueTail = previous; // Is in this case always not a null pointer
-                    queueTail->next = NULL;
+                    queueTail = previous; // Is in this case always not a nullptr pointer
+                    queueTail->next = nullptr;
                 }
             }
             else
@@ -328,18 +354,19 @@ Tasking::Clock::dequeue(Tasking::EventImpl& event)
                 if (current == queueHead)
                 {
                     // Current is only head
-                    queueHead = current->next; // Is in this case always not a null pointer
+                    queueHead = current->next; // Is in this case always not a nullptr pointer
                 }
                 else
                 {
                     // Current is inside queue, next pointer of the previous element must corrected
                     previous->next = current->next;
+                    nextInQueueModified = true;
                 }
                 if (current->nextActivation_ms != current->next->nextActivation_ms)
                 {
                     // Time of next differs, previous pointer must change of all following with the same time
                     for (EventImpl* hasSameTime = current->next;
-                         (hasSameTime != NULL) &&
+                         (hasSameTime != nullptr) &&
                          (hasSameTime->nextActivation_ms == current->next->nextActivation_ms); //
                          hasSameTime = hasSameTime->next)
                     {
@@ -350,8 +377,8 @@ Tasking::Clock::dequeue(Tasking::EventImpl& event)
         }
     }
     event.queued = false; // Mark as no longer queued
-    event.next = NULL;
-    event.previous = NULL;
+    event.next = nullptr;
+    event.previous = nullptr;
 
     // Leave protected area if it was entered by this method
     timeQueueMutexMutex.enter();
@@ -368,7 +395,7 @@ Tasking::Clock::dequeue(Tasking::EventImpl& event)
 bool
 Tasking::Clock::isEmtpy(void) const
 {
-    return (queueHead == NULL);
+    return (queueHead == nullptr);
 }
 
 //-------------------------------------
@@ -377,7 +404,7 @@ bool
 Tasking::Clock::isPending(void) const
 {
     timeQueueMutex.enter();
-    bool pends = (queueHead != NULL);
+    bool pends = (queueHead != nullptr);
     if (pends)
     {
         pends = (queueHead->nextActivation_ms <= getTime());
@@ -391,34 +418,42 @@ Tasking::Clock::isPending(void) const
 Tasking::EventImpl*
 Tasking::Clock::readFirstPending(void)
 {
-    EventImpl* result = NULL;
+    EventImpl* result = nullptr;
+
     // Working on clock queue is critical
     timeQueueMutex.enter();
     // Only remove when one is pending.
-    if ((queueHead != NULL) && (queueHead->nextActivation_ms <= getTime()))
+    if ((queueHead != nullptr) && (queueHead->nextActivation_ms <= getTime()))
     {
+        // If element is the first none pending event the hone pending head need replaced
+        if (queueHead == nonePendingHead)
+        {
+            nonePendingHead = queueHead->next;
+        }
+
         // One event is pending and this is the queue head by the sorting order.
         result = queueHead;
         // When head element available remove it from list
         queueHead = result->next;
         // Mark as no longer queued
         result->queued = false;
+        result->next = nullptr;
         // If queue gets empty tail must also corrected
-        if (NULL == queueHead)
+        if (nullptr == queueHead)
         {
-            queueTail = NULL;
+            queueTail = nullptr;
         }
         else
         {
             // For not empty queue new head element has no previous element.
             // If read event was not first of the block the previous pointer of events with same time must corrected.
-            if (queueHead->previous != NULL)
+            if (queueHead->previous != nullptr)
             {
                 for (EventImpl* hasSameTime = queueHead;
-                     (hasSameTime != NULL) && (hasSameTime->nextActivation_ms == queueHead->nextActivation_ms);
+                     (hasSameTime != nullptr) && (hasSameTime->nextActivation_ms == queueHead->nextActivation_ms);
                      hasSameTime = hasSameTime->next)
                 {
-                    hasSameTime->previous = NULL;
+                    hasSameTime->previous = nullptr;
                 }
             }
         }
@@ -431,24 +466,52 @@ Tasking::Clock::readFirstPending(void)
 //-------------------------------------
 
 Tasking::Time
-Tasking::Clock::getNextGapTime(void) const
+Tasking::Clock::getNextStartTime(void)
 {
-    Time nextGapTime = 0u;
-    // Search for gap time when the clock queue is not empty
-    if (queueHead != NULL)
+    Time nextStartTime = 0u;
+    Time currentTime = getTime();
+    EventImpl* searchEvent = nullptr;
+
+    // Going into loop to restart search when the clock queue has modified in between.
+    nextInQueueModified = true;
+    while (nextInQueueModified)
     {
-        // Loop over the events in clock queue until a gap is found
-        for (EventImpl* event = queueHead->next; event != NULL; event = event->next)
+        // So long it is not set to true by modify the clock queue, stop search if found.
+        nextInQueueModified = false;
+
+        // Search first event in the future. Start with the last one found by getNextStartTime.
+        searchEvent = nonePendingHead;
+        if (searchEvent == nullptr)
         {
-            nextGapTime = event->nextActivation_ms - queueHead->nextActivation_ms;
-            if (nextGapTime > 0u)
+            searchEvent = queueHead;
+        }
+        // Search go until end of queue or when a new start time is found
+        while ((searchEvent != nullptr) && (nextStartTime == 0u))
+        {
+            // Is search event pending in the past
+            if (searchEvent->nextActivation_ms < currentTime)
             {
-                // Gap time is found, stop loop by jump to last event in queue.
-                event = queueTail;
+                // Is in past or now, check the next one
+                searchEvent = searchEvent->next;
+                // Before utilize search event it check for queue modification
+                if (nextInQueueModified)
+                {
+                    // Queue is modified. So, don't trust order of next and restart search by going to outer loop.
+                    searchEvent = nullptr;
+                }
+            }
+            else
+            {
+                // Search event will start in the future, next wake up time in queue found
+                nextStartTime = searchEvent->nextActivation_ms;
             }
         }
     }
-    return nextGapTime;
+    // Mark for next search the starting point in queue.
+    // When loop ended by null pointer also reset of pending head happen.
+    nonePendingHead = searchEvent;
+
+    return nextStartTime;
 }
 
 //-------------------------------------
@@ -458,7 +521,7 @@ Tasking::Clock::getHeadTime(void) const
 {
     Time headTime = 0u;
     EventImpl* head = queueHead;
-    if (head != NULL)
+    if (head != nullptr)
     {
         headTime = head->nextActivation_ms;
     }

@@ -23,11 +23,14 @@ T_LIB_PATH = ../build/tasking/lib
 -include ../build/tasking/variant.mk
 
 CXXFLAGS += -I$(T_INCLUDE_PATH)
+ 
+# Size reduction by eliminating dead code
+CXXFLAGS += -Wl,--gc-sections 
 
 .PHONY : all help channelExample ioChannelExample multiparallelExample periodicTaskExample \
   timeOutExample customPlatform clean tasking
 
-all: channelExample ioChannelExample multiparallelExample periodicTaskExample timeOutExample
+all: channelExample ioChannelExample multiparallelExample periodicTaskExample timeOutExample filterExample
 
 help:
 	@echo "Make targets:"
@@ -54,6 +57,9 @@ periodicTaskExample: | tasking $(BIN_PATH)
 timeOutExample: | tasking $(BIN_PATH)
 	@$(CXX) $(CFLAGS) $(CXXFLAGS) timeOutExample.cpp -L$(T_LIB_PATH) -ltasking -lpthread -o $(BIN_PATH)/timeOutExample
 	
+filterExample: | tasking $(BIN_PATH)
+	@$(CXX) $(CFLAGS) $(CXXFLAGS) filterExample.cpp -L$(T_LIB_PATH) -ltasking -lpthread -o $(BIN_PATH)/filterExample
+
 customPlatform:
 	@cd customPlatform && $(MAKE) customPlatform MAKEFLAGS=
 

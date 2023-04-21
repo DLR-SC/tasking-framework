@@ -20,17 +20,26 @@
 #define INCLUDE_TASKUTILS_H_
 
 #include "taskTypes.h"
-#include <mutex.h>
+#include <mutexImpl.h>
+
+#include "impl/taskUtils_impl.h"
 
 namespace Tasking
 {
+
+class Channel;
+class Task;
 
 /**
  * Convert a name into a task identification.
  * @param name String with the name to convert.
  * @result TaskId computed from the name.
  */
-TaskId getTaskIdFromName(const char* name);
+inline TaskId
+getTaskIdFromName(const char* name)
+{
+    return getIdentificationFromName<TaskId>(name);
+}
 
 /**
  * Convert a task identification to a name.
@@ -40,7 +49,11 @@ TaskId getTaskIdFromName(const char* name);
  * with less than five bytes it is mandatory to set the value. The resulting string is shorten to the length.
  * @return Pointer to the name of the task with the corresponding identification. Pointer is identical to @a buffer.
  */
-char* convertTaskIdToString(TaskId id, char* buffer, size_t length = 5);
+inline char*
+convertTaskIdToString(TaskId id, char* buffer, size_t length = sizeof(TaskId) + 1u)
+{
+    return convertIdentificationToString(id, buffer, length);
+}
 
 /**
  * Convert a name into a task identification.
@@ -50,7 +63,7 @@ char* convertTaskIdToString(TaskId id, char* buffer, size_t length = 5);
 inline ChannelId
 getChannelIdFromName(const char* name)
 {
-    return static_cast<ChannelId>(getTaskIdFromName(name));
+    return getIdentificationFromName<ChannelId>(name);
 }
 
 /**
@@ -62,9 +75,54 @@ getChannelIdFromName(const char* name)
  * @return Pointer to the name of the task with the corresponding identification. Pointer is identical to @a buffer.
  */
 inline char*
-convertChannelIdToString(ChannelId id, char* buffer, size_t length = 5)
+convertChannelIdToString(ChannelId id, char* buffer, size_t length = sizeof(ChannelId) + 1u)
 {
-    return convertTaskIdToString(static_cast<TaskId>(id), buffer, length);
+    return convertIdentificationToString(id, buffer, length);
+}
+
+/**
+ * Class to request the name of a task or channel
+ * Usage will be IdConverter(channel).name.
+ */
+class IdConverter
+{
+public:
+    /**
+     * Initialize the ID converter by a readout and conversion of the channel name
+     * @param channel Reference to the channel to read out the name
+     */
+    IdConverter(const Tasking::Channel& channel);
+
+    /**
+     * Initialize the ID converter by a readout and conversion of the task name
+     * @param tasl Reference to the task to read out the name
+     */
+    IdConverter(const Tasking::Task& task);
+
+    // Name of the channel or task.
+    char name[((sizeof(TaskId) < sizeof(ChannelId)) ? sizeof(TaskId) : sizeof(ChannelId)) + 1];
+};
+
+/**
+ * Inline wrapper class to the Mutex implementation
+ */
+class Mutex : protected MutexImpl
+{
+public:
+    /// Enter into the critical region protected by the Mutex
+    void enter(void);
+    /// Leave the critical region protected by the Mutex
+    void leave(void);
+};
+inline void
+Mutex::enter(void)
+{
+    MutexImpl::enter();
+}
+inline void
+Mutex::leave(void)
+{
+    MutexImpl::leave();
 }
 
 /**

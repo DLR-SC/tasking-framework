@@ -22,7 +22,8 @@
 // Standard integer definitions are needed to get UINTMAX_MAX
 #include <limits>
 
-#include <taskInput.h>
+#include "../taskInput.h"
+#include "../taskUtils.h"
 
 namespace Tasking
 {
@@ -72,11 +73,11 @@ struct InputImpl
     /// Flag to indicate synchronization mode
     bool m_synchron;
 
-    /// Number of activations since last reset
-    volatile unsigned int m_activations;
+    /// Number of notifications since last reset
+    volatile unsigned int m_notifications;
 
-    /// Flag to count missed activation in synchronization mode
-    volatile unsigned int m_missedActivations;
+    /// Flag to count missed notifications in synchronization mode
+    volatile unsigned int m_missedNotifications;
 
     /// Threshold of activation to activate the input
     unsigned int m_activationThreshold;

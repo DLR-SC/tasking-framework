@@ -22,11 +22,11 @@
 void
 Tasking::Signaler::wait()
 {
-    assert(Mutex::occupied);
+    assert(MutexImpl::occupied);
 }
 
 void
 Tasking::Signaler::signal(void)
 {
-    assert(Mutex::occupied);
+    assert(MutexImpl::occupied);
 }

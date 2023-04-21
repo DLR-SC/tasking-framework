@@ -20,10 +20,10 @@
 //#include <unittest/configurable_event_listener.h>
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-//    unittest::registerConfigurableEventListener();
+    //    unittest::registerConfigurableEventListener();
 
     return RUN_ALL_TESTS();
 }

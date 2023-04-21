@@ -25,19 +25,22 @@
 class TestSchedulePolicyLifo : public ::testing::Test
 {
 public:
-    TestSchedulePolicyLifo(void): scheduler(policy) {
+    TestSchedulePolicyLifo(void) : scheduler(policy)
+    {
     }
+
 protected:
     class CheckTask : public Tasking::Task
     {
     public:
         CheckTask(Tasking::Scheduler& scheduler) :
-                        Task(scheduler, policyData, inputs), impl(scheduler, policyData, *this, inputs)
+            Task(scheduler, policyData, inputs), impl(scheduler, policyData, *this, inputs)
         {
             // Nothing else to do.
         }
         /// Implement execute because it is necessary by default
-        void execute(void)
+        void
+        execute(void)
         {
             // Nothing to do in this test
         }
@@ -50,13 +53,14 @@ protected:
     Tasking::SchedulerUnitTest scheduler;
 };
 
-TEST_F(TestSchedulePolicyLifo, ordering) {
+TEST_F(TestSchedulePolicyLifo, ordering)
+{
     // After initialization there is no next task in the LIFO
-    EXPECT_TRUE((policy.nextTask() == NULL));
+    EXPECT_TRUE((policy.nextTask() == nullptr));
     CheckTask task1(scheduler);
     policy.queue(task1.impl);
     EXPECT_TRUE((policy.nextTask() == &task1.impl));
-    EXPECT_TRUE((policy.nextTask() == NULL));
+    EXPECT_TRUE((policy.nextTask() == nullptr));
     // LIFO is empty now
     CheckTask task2(scheduler);
     policy.queue(task2.impl);

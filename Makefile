@@ -50,11 +50,20 @@ srcSources = $(wildcard src/*.cpp)
 srcDependencies = $(patsubst src/%,build/%,$(srcSources:.cpp=.d))
 srcObjects = $(patsubst src/%,build/%,$(srcSources:.cpp=.o))
 
+# Find out channel files and convert to objects in build folder
+channelsSources = $(wildcard channels/src/*.cpp)
+channelsDependencies = $(patsubst channels/src/%,build/%,$(channelsSources:.cpp=.d))
+channelsObjects = $(patsubst channels/src/%,build/%,$(channelsSources:.cpp=.o))
+
 testSource = $(wildcard test/*cpp)
 testObjects = $(patsubst %,build/%,$(testSource:.cpp=.o))
 
 # Setup includes and other flags for the build
 CXXFLAGS += -Iinclude
+CXXFLAGS += -Ichannels/include
+
+# Optimize size for static linkage with linker option --gc-sections
+CXXFLAGS += -ffunction-sections
 
 help :
 	@echo "Targets for make:"
@@ -65,6 +74,7 @@ help :
 	@echo "            Call 'make clean' if you generate for a different platform."
 	@echo "  install : Generate the tasking directory with lib and include folder."
 	@echo "            Platform option is necessary if it is different from Linux."
+	@echo "  test    : Generate gtest tests."
 	@echo "  clean   : Remove the build folder"
 	@echo "  examples: Compile all examples"
 	@echo
@@ -80,14 +90,15 @@ help :
 	@echo "                       include path in the CXXFLAGS."
 
 # Generate lib file for the Tasking Framework
-lib: $(schedulerObjects) $(srcObjects) | build/lib
+lib: $(schedulerObjects) $(srcObjects) $(channelsObjects)| build/lib
 	@echo "<<<< Create lib for scheduler type $(platform) >>>>"
-	ar rcs build/lib/libtasking.a $(schedulerObjects) $(srcObjects)
+	ar rcs build/lib/libtasking.a $(schedulerObjects) $(srcObjects) $(channelsObjects)
 
 # Generate an install folder to roll out
 install: lib | build/tasking
 	@cp build/lib/libtasking.a build/tasking/lib/libtasking.a
 	@cp include/*.h build/tasking/include
+	@cp channels/include/channels/*.h build/tasking/include
 	@cp -r include/impl build/tasking/include/impl
 ifneq ("$(platform)", "custom")
 	@cp $(schedulerFolder)/*.h build/tasking/include
@@ -97,17 +108,22 @@ endif
 	@echo "Tasking framework for $(platform) provided in folder build/tasking."
 	
 # Update dependencies
-depend: $(srcDependencies) $(schedulerDependencies)
+depend: $(srcDependencies) $(schedulerDependencies) $(channelsDependencies)
 
 build/%.d: src/%.cpp | build
 	@$(CXX) -MM $(CXXFLAGS) $< > $@
 	@sed -i '1s/.*/build\/&/; $$s/.*/& | build/' $@
-	@echo -e "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
+	@printf "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
 	@sed -i '$$s/\.d/.o/' $@
 build/%.d: $(schedulerFolder)/%.cpp | build
 	@$(CXX) -MM $(CXXFLAGS) $< > $@
 	@sed -i '1s/.*/build\/&/; $$s/.*/& | build/' $@
-	@echo -e "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
+	@printf "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
+	@sed -i '$$s/\.d/.o/' $@
+build/%.d: channels/src/%.cpp | build
+	@$(CXX) -MM $(CXXFLAGS) $< > $@
+	@sed -i '1s/.*/build\/&/; $$s/.*/& | build/' $@
+	@printf "\t$(CXX) -c $(CXXFLAGS) $< -o $@" >> $@
 	@sed -i '$$s/\.d/.o/' $@
 	
 # Generate unit tests (googletest required)
@@ -151,5 +167,5 @@ build:
 examples:
 	@$(MAKE) -C examples all
 	
--include $(srcDependencies) $(schedulerDependencies)
+-include $(srcDependencies) $(schedulerDependencies) $(channelsDependencies)
 	

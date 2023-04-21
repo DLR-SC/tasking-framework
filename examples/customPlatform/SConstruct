@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+import os
+
+## Define project paths --------------------------------------------------------
+root_path = os.path.abspath('../..')
+tool_path = os.path.join(root_path, 'conf/scons/site_tools')
+build_path = os.path.join(root_path, 'build')
+
+variant_dir = 'custom'
+# All environment settings are collected in env_options
+env_options = {
+    'toolpath'         : [tool_path],
+    'tools'            : ['default',
+                          'utils_buildformat',
+                          'utils_common',
+                          'utils_git_submodules',
+                          'compiler_hosted_gcc'],
+    'CXXFLAGS_language' : ['-std=c++11',
+                           '-pedantic'],
+    'ENV'              : os.environ,
+}
+
+# Set the platform to custom
+env_options['PLATFORM'] = 'custom'
+variant_dir = 'custom_Example'
+
+# Create the environment with the given configuration
+envGlobal = Environment(**env_options)
+envGlobal.Tool('settings_buildpath')
+
+envGlobal['BASEPATH'] = root_path
+envGlobal['ROOTPATH'] = root_path
+envGlobal['TASKINGPATH'] = root_path
+envGlobal['BUILDPATH'] = os.path.join(build_path, variant_dir)
+envGlobal['BINPATH'] = os.path.join(envGlobal['BUILDPATH'], 'bin')
+envGlobal['LIBINSTALLPATH'] = os.path.join(envGlobal['BUILDPATH'], 'lib')
+envGlobal['LIBPATH'] = envGlobal['LIBINSTALLPATH']
+
+# Select Tasking versions by compile target
+if 'test' in COMMAND_LINE_TARGETS:
+    envGlobal['GTEST_SUPPORT_NEEDED'] = 'yes'
+else:
+    envGlobal['GTEST_SUPPORT_NEEDED'] = 'no'
+
+## Source targets
+envGlobal.SConscript('SConscript',
+                     exports = 'envGlobal',
+                     duplicate = 0)
+envGlobal.SConscript('../../SConscript',
+                     exports = 'envGlobal',
+                     duplicate = 0)

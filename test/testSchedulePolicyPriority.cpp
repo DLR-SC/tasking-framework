@@ -25,44 +25,48 @@
 class TestSchedulePolicyPriority : public ::testing::Test
 {
 public:
-    TestSchedulePolicyPriority(void) :
-                    scheduler(policy)
+    TestSchedulePolicyPriority(void) : scheduler(policy)
     {
     }
+
 protected:
     class CheckTask : public Tasking::Task
     {
     public:
         CheckTask(Tasking::Scheduler& scheduler, Tasking::SchedulePolicyPriority::Settings settings) :
-                        Task(scheduler, policyData, inputs), policyData(settings), impl(scheduler, policyData, *this, inputs)
+            Task(scheduler, policyData, inputs), policyData(settings), impl(scheduler, policyData, *this, inputs)
         {
             // Nothing else to do.
         }
         /// Implement execute because it is necessary by default
-        void execute(void)
+        void
+        execute(void)
         {
             // Nothing to do in this test
         }
         Tasking::InputArrayProvider<1u> inputs;
         Tasking::SchedulePolicyPriority::ManagementData policyData;
-        Tasking::TaskImpl impl; // Tricky, because we need access to the private implementation, create a new one for the test.
+        Tasking::TaskImpl impl; // Tricky, because we need access to the private implementation, create a new one for
+                                // the test.
     };
 
     class CheckTaskProvider : public Tasking::TaskProvider<1u, Tasking::SchedulePolicyPriority>
     {
     public:
         CheckTaskProvider(Tasking::Scheduler& scheduler, Tasking::SchedulePolicyPriority::Settings settings) :
-                        Tasking::TaskProvider<1u, Tasking::SchedulePolicyPriority>(scheduler, settings, "Check"),
-                        impl(scheduler, policyData, *this, inputs)
+            Tasking::TaskProvider<1u, Tasking::SchedulePolicyPriority>(scheduler, settings, "Check"),
+            impl(scheduler, policyData, *this, inputs)
         {
             // Nothing else to do.
         }
         /// Implement execute because it is necessary by default
-        void execute(void)
+        void
+        execute(void)
         {
             // Nothing to do in this test
         }
-        Tasking::TaskImpl impl; // Tricky, because we need access to the private implementation, create a new one for the test.
+        Tasking::TaskImpl impl; // Tricky, because we need access to the private implementation, create a new one for
+                                // the test.
     };
 
     Tasking::SchedulePolicyPriority policy;
@@ -72,11 +76,11 @@ protected:
 TEST_F(TestSchedulePolicyPriority, Ordering)
 {
     // After initialization there is no next task in the priority tree
-    EXPECT_TRUE((policy.nextTask() == NULL));
+    EXPECT_TRUE((policy.nextTask() == nullptr));
     CheckTask task2(scheduler, Tasking::SchedulePolicyPriority::Settings(2u));
     EXPECT_TRUE(policy.queue(task2.impl));
     EXPECT_TRUE((policy.nextTask() == &task2.impl));
-    EXPECT_TRUE((policy.nextTask() == NULL));
+    EXPECT_TRUE((policy.nextTask() == nullptr));
     EXPECT_TRUE(policy.queue(task2.impl)); // Tasks 2
     CheckTask task0a(scheduler, Tasking::SchedulePolicyPriority::Settings(0));
     EXPECT_FALSE(policy.queue(task0a.impl)); // Tasks 2 0a
@@ -94,7 +98,7 @@ TEST_F(TestSchedulePolicyPriority, Ordering)
     EXPECT_TRUE((policy.nextTask() == &task1.impl)); // Tasks 0a 0b
     EXPECT_TRUE((policy.nextTask() == &task0a.impl)); // Tasks 0b
     EXPECT_TRUE((policy.nextTask() == &task0b.impl)); // Empty
-    EXPECT_TRUE((policy.nextTask() == NULL));
+    EXPECT_TRUE((policy.nextTask() == nullptr));
 }
 
 TEST_F(TestSchedulePolicyPriority, UsingTaskProvider)

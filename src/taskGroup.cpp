@@ -48,7 +48,7 @@ Tasking::Group::join(Tasking::Task& task)
 {
     // Find a not occupied position in the task list
     unsigned int freeSlot = 0;
-    while ((freeSlot < impl.maxTasks) && (impl.taskList[freeSlot] != NULL))
+    while ((freeSlot < impl.maxTasks) && (impl.taskList[freeSlot] != nullptr))
     {
         ++freeSlot;
     }
@@ -88,7 +88,7 @@ bool
 Tasking::GroupImpl::areAllExecuted(void) const
 {
     bool result = true;
-    for (unsigned int i = 0; result && (i < maxTasks) && (taskList[i] != NULL); i++)
+    for (unsigned int i = 0; result && (i < maxTasks) && (taskList[i] != nullptr); i++)
     {
         result = taskList[i]->isExecuted();
     }
@@ -101,7 +101,7 @@ void
 Tasking::GroupImpl::reset(void)
 {
     // Reset all tasks of the group;
-    for (unsigned int i = 0; (i < maxTasks) && (taskList[i] != NULL); i++)
+    for (unsigned int i = 0; (i < maxTasks) && (taskList[i] != nullptr); i++)
     {
         taskList[i]->parent.reset();
     }

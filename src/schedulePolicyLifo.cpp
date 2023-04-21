@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-#include <cstddef>
-
 #include <schedulePolicyLifo.h>
 #include <task.h>
 

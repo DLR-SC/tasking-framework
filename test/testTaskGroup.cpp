@@ -27,9 +27,7 @@
 class TestTaskGroup : public ::testing::Test
 {
 public:
-
-    TestTaskGroup(void) :
-                    scheduler(policy), checker1(scheduler), checker2(scheduler)
+    TestTaskGroup(void) : scheduler(policy), checker1(scheduler), checker2(scheduler)
     {
         checker1.configureInput(0, msg[0]);
         scheduler.start();
@@ -38,7 +36,8 @@ public:
     class CheckMessage : public Tasking::Channel
     {
     public:
-        void push(void)
+        void
+        push(void)
         {
             Channel::push();
         }
@@ -49,17 +48,19 @@ public:
     {
     public:
         CheckTask(Tasking::Scheduler& scheduler) :
-                        TaskProvider<1, Tasking::SchedulePolicyLifo>(scheduler), calls(0), resets(0), doTaskReset(true)
+            TaskProvider<1, Tasking::SchedulePolicyLifo>(scheduler), calls(0), resets(0), doTaskReset(true)
         {
             inputs[0].configure(1);
         }
         /// Overload execute to count executions
-        void execute(void)
+        void
+        execute(void)
         {
             calls++;
         }
         /// Overload reset to reset count of executions to zero
-        void reset(void)
+        void
+        reset(void)
         {
             resets++;
             if (doTaskReset)
@@ -76,7 +77,8 @@ public:
     };
 
     /// Test group for two tasks.
-    class TestGroup: public Tasking::GroupProvider<2> {
+    class TestGroup : public Tasking::GroupProvider<2>
+    {
     public:
         using Tasking::Group::areAllExecuted;
     };
@@ -88,7 +90,8 @@ public:
     CheckMessage msg[2];
     TestGroup group;
 
-    void preparefullConnection(void)
+    void
+    preparefullConnection(void)
     {
         checker2.configureInput(0, msg[1]);
         group.join(checker1);
@@ -132,4 +135,3 @@ TEST_F(TestTaskGroup, executeCylce)
     EXPECT_EQ(2, checker1.resets);
     EXPECT_EQ(2, checker2.resets);
 }
-

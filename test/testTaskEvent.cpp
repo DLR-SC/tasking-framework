@@ -25,20 +25,20 @@
 class TestTaskEvent : public ::testing::Test
 {
 public:
-    // Count task has to inputs configured with one arrival final.
+    // Count task has to inputs configured with one notification and final.
     class CountTask : public Tasking::TaskProvider<2u, Tasking::SchedulePolicyLifo>
     {
     public:
         unsigned int counter;
-        CountTask(Tasking::Scheduler& scheduler) :
-                        TaskProvider(scheduler), counter(0u)
+        CountTask(Tasking::Scheduler& scheduler) : TaskProvider(scheduler), counter(0u)
         {
             inputs[0].configure(1u, true);
             inputs[0].setSynchron(false);
             inputs[1].configure(1u, true);
             inputs[1].setSynchron(false);
         }
-        virtual void execute(void)
+        virtual void
+        execute(void)
         {
             counter++;
         }
@@ -49,18 +49,20 @@ public:
     {
     public:
         ControlledEvent(Tasking::Scheduler& scheduler) :
-                        Event(scheduler), onFireCounter(0u), shallFireCounter(0u), allowFire(true)
+            Event(scheduler), onFireCounter(0u), shallFireCounter(0u), allowFire(true)
         {
         }
-        ControlledEvent(Tasking::Scheduler& scheduler, const char *name) :
-                        Event(scheduler, name), onFireCounter(0u), shallFireCounter(0u), allowFire(true)
+        ControlledEvent(Tasking::Scheduler& scheduler, const char* name) :
+            Event(scheduler, name), onFireCounter(0u), shallFireCounter(0u), allowFire(true)
         {
         }
-        void onFire(void) override
+        void
+        onFire(void) override
         {
             ++onFireCounter;
         }
-        bool shallFire(void) override
+        bool
+        shallFire(void) override
         {
             ++shallFireCounter;
             return allowFire;
@@ -76,8 +78,7 @@ public:
     ControlledEvent unallowedEvent;
     CountTask task;
 
-    TestTaskEvent(void) :
-                    scheduler(policy), event(scheduler), unallowedEvent(scheduler), task(scheduler)
+    TestTaskEvent(void) : scheduler(policy), event(scheduler), unallowedEvent(scheduler), task(scheduler)
     {
         task.configureInput(0u, event);
         task.configureInput(1u, unallowedEvent);
@@ -144,17 +145,18 @@ TEST_F(TestTaskEvent, isTriggered)
     EXPECT_FALSE(event.isTriggered());
 }
 
-
-TEST_F(TestTaskEvent, StoppTrigger) {
-  event.setRelativeTiming(50u);
-  event.reset();
-  scheduler.schedule(10u);
-  event.stop();
-  scheduler.schedule(50u);
-  EXPECT_EQ(0u, task.counter);
+TEST_F(TestTaskEvent, StoppTrigger)
+{
+    event.setRelativeTiming(50u);
+    event.reset();
+    scheduler.schedule(10u);
+    event.stop();
+    scheduler.schedule(50u);
+    EXPECT_EQ(0u, task.counter);
 }
 
-TEST_F(TestTaskEvent, PeriodicTiming) {
+TEST_F(TestTaskEvent, PeriodicTiming)
+{
     event.setPeriodicTiming(5u, 3u);
     unallowedEvent.setPeriodicTiming(2u, 4u);
     scheduler.schedule(2u); // 2 ms
@@ -188,7 +190,8 @@ TEST_F(TestTaskEvent, PeriodicTiming) {
     EXPECT_EQ(5u, unallowedEvent.shallFireCounter);
 }
 
-TEST_F(TestTaskEvent, PeriodicTimingReset) {
+TEST_F(TestTaskEvent, PeriodicTimingReset)
+{
     // Additional reset operation has no effect on periodic timing, e.g. by final inputs
     event.setPeriodicTiming(5u, 2u);
     scheduler.schedule(4u); // 4 ms
@@ -200,7 +203,8 @@ TEST_F(TestTaskEvent, PeriodicTimingReset) {
     EXPECT_EQ(2u, task.counter);
 }
 
-TEST_F(TestTaskEvent, PeriodicTimingNotEndedByTrigger) {
+TEST_F(TestTaskEvent, PeriodicTimingNotEndedByTrigger)
+{
     event.setPeriodicTiming(5u, 3u);
     scheduler.schedule(4u); // 4 ms
     EXPECT_EQ(1u, task.counter);
@@ -214,7 +218,8 @@ TEST_F(TestTaskEvent, PeriodicTimingNotEndedByTrigger) {
     EXPECT_EQ(2u, task.counter);
 }
 
-TEST_F(TestTaskEvent, ZeroPeriod) {
+TEST_F(TestTaskEvent, ZeroPeriod)
+{
     event.setPeriodicTiming(0u, 5u);
     scheduler.schedule(4u); // 4 ms
     EXPECT_EQ(0u, task.counter);
@@ -227,7 +232,8 @@ TEST_F(TestTaskEvent, ZeroPeriod) {
     EXPECT_EQ(2u, task.counter);
 }
 
-TEST_F(TestTaskEvent, RelativeTiming) {
+TEST_F(TestTaskEvent, RelativeTiming)
+{
     event.setRelativeTiming(5u);
     unallowedEvent.setRelativeTiming(6u);
     scheduler.schedule(5u); // 5 ms No run, because no reset yet
@@ -261,7 +267,8 @@ TEST_F(TestTaskEvent, RelativeTiming) {
     EXPECT_EQ(1u, unallowedEvent.shallFireCounter);
 }
 
-TEST_F(TestTaskEvent, RelativeTimingNotEndedByTrigger) {
+TEST_F(TestTaskEvent, RelativeTimingNotEndedByTrigger)
+{
     event.setRelativeTiming(5u);
     task.reset();
     scheduler.schedule(2u); // 2 ms
@@ -276,7 +283,8 @@ TEST_F(TestTaskEvent, RelativeTimingNotEndedByTrigger) {
     EXPECT_EQ(1u, task.counter);
 }
 
-TEST_F(TestTaskEvent, ExecutionsWithDelay) {
+TEST_F(TestTaskEvent, ExecutionsWithDelay)
+{
     event.setPeriodicTiming(5u, 5u);
     task.reset();
     scheduler.schedule(9u);
@@ -288,12 +296,13 @@ TEST_F(TestTaskEvent, ExecutionsWithDelay) {
     EXPECT_EQ(3u, task.counter);
 }
 
-TEST_F(TestTaskEvent, shallFireAndOnFire) {
+TEST_F(TestTaskEvent, shallFireAndOnFire)
+{
     event.allowFire = false;
     event.trigger(1u);
     scheduler.schedule(1u);
     EXPECT_EQ(0u, event.onFireCounter);
-    event.setPeriodicTiming(1u,1u);
+    event.setPeriodicTiming(1u, 1u);
     scheduler.schedule(1u);
     EXPECT_EQ(0u, event.onFireCounter);
     event.stop();
@@ -307,7 +316,7 @@ TEST_F(TestTaskEvent, shallFireAndOnFire) {
     event.trigger(1u);
     scheduler.schedule(1u);
     EXPECT_EQ(1u, event.onFireCounter);
-    event.setPeriodicTiming(1u,1u);
+    event.setPeriodicTiming(1u, 1u);
     scheduler.schedule(1u);
     EXPECT_EQ(2u, event.onFireCounter);
     event.stop();
@@ -315,10 +324,10 @@ TEST_F(TestTaskEvent, shallFireAndOnFire) {
     task.reset();
     scheduler.schedule(1u);
     EXPECT_EQ(3u, event.onFireCounter);
-
 }
 
-TEST_F(TestTaskEvent, requestTime) {
+TEST_F(TestTaskEvent, requestTime)
+{
     EXPECT_EQ(0u, event.now());
     scheduler.schedule(2u);
     EXPECT_EQ(2u, event.now());
@@ -327,7 +336,7 @@ TEST_F(TestTaskEvent, requestTime) {
 TEST_F(TestTaskEvent, configurePeriodicOnQueuedEvent)
 {
     event.trigger(1u); // Queue event
-    event.setPeriodicTiming(2u,3u);
+    event.setPeriodicTiming(2u, 3u);
     scheduler.schedule(1u);
     EXPECT_EQ(0u, task.counter);
     scheduler.schedule(1u);

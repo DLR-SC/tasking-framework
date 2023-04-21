@@ -1,0 +1,26 @@
+authors:
+  - given-names: Olaf
+  - family-names: Maibaum
+  - name: "DLR Institute for Software Technology, Group Onboard Software Systems"
+cff-version: "1.2.0"
+contact:
+  - address: "Lilienthalplatz 7"
+  - affiliation: "German Aerospace Center (DLR), Institute for Software Technology"
+  - city: Braunschweig
+  - post-code: 38108
+  - country: DE
+  - family-names: Maibaum
+  - given-names: Olaf
+  - orcid: "https://orcid.org/0000-0003-3918-9667"
+  - tel: +49-531-2952974
+  - fax: +49-531-2952767
+  - website
+data-released: "2020-11-13"
+license: "Apache License, Version 2.0"
+license-url: "http://www.apache.org/licenses/LICENSE-2.0"
+message: "If you use this software, please cite it using the metadata from this file."
+repository-code: "https://github.com/DLR-SC/tasking-framework"
+title: "Tasking Framework"
+type: software
+url: "https://github.com/DLR-SC/tasking-framework/wiki"
+version: "1.0.1"

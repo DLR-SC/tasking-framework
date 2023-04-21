@@ -23,24 +23,21 @@
 class TestTaskChannel : public ::testing::Test
 {
 public:
-
     // Class for direct access to protected methods
     class IDChannel : public Tasking::Channel
     {
     public:
-        IDChannel(Tasking::ChannelId id = 0) :
-                        Tasking::Channel(id)
+        IDChannel(Tasking::ChannelId id = 0) : Tasking::Channel(id)
         {
             // Nothing else to do.
         }
-        IDChannel(const char* name) :
-                        Tasking::Channel(name)
+        IDChannel(const char* name) : Tasking::Channel(name)
         {
             // Nothing else to do.
         }
-        using Tasking::Channel::push;
         using Tasking::Channel::associateTo;
         using Tasking::Channel::deassociate;
+        using Tasking::Channel::push;
     };
 };
 
@@ -73,46 +70,47 @@ TEST_F(TestTaskChannel, associateDeassociate)
         // Call of Channel::associateTo must be indirect over Input::associate
         inputs[i].associate(channel);
     }
-    // Remove one input in the middle, call is only possible by indirect call of Input::deassociate instead of Channel::deassociate
+    // Remove one input in the middle, call is only possible by indirect call of Input::deassociate instead of
+    // Channel::deassociate
     inputs[2].deassociate();
     channel.push();
-    EXPECT_EQ(1u, inputs[0].getActivations());
-    EXPECT_EQ(1u, inputs[1].getActivations());
-    EXPECT_EQ(0u, inputs[2].getActivations());
-    EXPECT_EQ(1u, inputs[3].getActivations());
-    EXPECT_EQ(1u, inputs[4].getActivations());
+    EXPECT_EQ(1u, inputs[0].getNotifications());
+    EXPECT_EQ(1u, inputs[1].getNotifications());
+    EXPECT_EQ(0u, inputs[2].getNotifications());
+    EXPECT_EQ(1u, inputs[3].getNotifications());
+    EXPECT_EQ(1u, inputs[4].getNotifications());
     // Remove first associated
     inputs[0].deassociate();
     channel.push();
-    EXPECT_EQ(1u, inputs[0].getActivations());
-    EXPECT_EQ(2u, inputs[1].getActivations());
-    EXPECT_EQ(0u, inputs[2].getActivations());
-    EXPECT_EQ(2u, inputs[3].getActivations());
-    EXPECT_EQ(2u, inputs[4].getActivations());
+    EXPECT_EQ(1u, inputs[0].getNotifications());
+    EXPECT_EQ(2u, inputs[1].getNotifications());
+    EXPECT_EQ(0u, inputs[2].getNotifications());
+    EXPECT_EQ(2u, inputs[3].getNotifications());
+    EXPECT_EQ(2u, inputs[4].getNotifications());
     // Remove last associated
     inputs[4].deassociate();
     channel.push();
-    EXPECT_EQ(1u, inputs[0].getActivations());
-    EXPECT_EQ(3u, inputs[1].getActivations());
-    EXPECT_EQ(0u, inputs[2].getActivations());
-    EXPECT_EQ(3u, inputs[3].getActivations());
-    EXPECT_EQ(2u, inputs[4].getActivations());
+    EXPECT_EQ(1u, inputs[0].getNotifications());
+    EXPECT_EQ(3u, inputs[1].getNotifications());
+    EXPECT_EQ(0u, inputs[2].getNotifications());
+    EXPECT_EQ(3u, inputs[3].getNotifications());
+    EXPECT_EQ(2u, inputs[4].getNotifications());
     // Remove not associated
     inputs[5].deassociate();
-    EXPECT_EQ(1u, inputs[0].getActivations());
-    EXPECT_EQ(3u, inputs[1].getActivations());
-    EXPECT_EQ(0u, inputs[2].getActivations());
-    EXPECT_EQ(3u, inputs[3].getActivations());
-    EXPECT_EQ(2u, inputs[4].getActivations());
+    EXPECT_EQ(1u, inputs[0].getNotifications());
+    EXPECT_EQ(3u, inputs[1].getNotifications());
+    EXPECT_EQ(0u, inputs[2].getNotifications());
+    EXPECT_EQ(3u, inputs[3].getNotifications());
+    EXPECT_EQ(2u, inputs[4].getNotifications());
     // Remove all remaining
     inputs[1].deassociate();
     inputs[3].deassociate();
     channel.push();
-    EXPECT_EQ(1u, inputs[0].getActivations());
-    EXPECT_EQ(3u, inputs[1].getActivations());
-    EXPECT_EQ(0u, inputs[2].getActivations());
-    EXPECT_EQ(3u, inputs[3].getActivations());
-    EXPECT_EQ(2u, inputs[4].getActivations());
+    EXPECT_EQ(1u, inputs[0].getNotifications());
+    EXPECT_EQ(3u, inputs[1].getNotifications());
+    EXPECT_EQ(0u, inputs[2].getNotifications());
+    EXPECT_EQ(3u, inputs[3].getNotifications());
+    EXPECT_EQ(2u, inputs[4].getNotifications());
 }
 
 TEST_F(TestTaskChannel, testWrongfulAssociation)

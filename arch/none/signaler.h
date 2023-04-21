@@ -19,13 +19,13 @@
 #ifndef TASKING_INCLUDE_ARCH_NONE_SIGNALER_H_
 #define TASKING_INCLUDE_ARCH_NONE_SIGNALER_H_
 
-#include "mutex.h"
+#include "mutexImpl.h"
 
 namespace Tasking
 {
 
 /// Implementation of a signaler without functionality
-class Signaler : public Mutex
+class Signaler : public MutexImpl
 {
 public:
     /**

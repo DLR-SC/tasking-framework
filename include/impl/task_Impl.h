@@ -19,9 +19,9 @@
 #ifndef INCLUDE_IMPL_TASK_IMPL_H_
 #define INCLUDE_IMPL_TASK_IMPL_H_
 
-#include "schedulePolicy.h"
-#include "taskInputArray.h"
-#include <mutex.h>
+#include "../schedulePolicy.h"
+#include "../taskInputArray.h"
+#include "../taskUtils.h"
 
 namespace Tasking
 {

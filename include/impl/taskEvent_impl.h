@@ -19,7 +19,7 @@
 #ifndef INCLUDE_IMPL_TASKEVENT_IMPL_H_
 #define INCLUDE_IMPL_TASKEVENT_IMPL_H_
 
-#include <mutex.h>
+#include "../taskUtils.h"
 #include "../taskChannel.h"
 #include "../taskTypes.h"
 
@@ -86,7 +86,7 @@ struct EventImpl
     mutable Mutex mutex;
 
     /// Flag to indicate the tasking framework is inside the protected region. Only checked in stop.
-    bool mutexLock;
+    volatile bool mutexLock;
 
     /**
      * Task specific processing of the time event.

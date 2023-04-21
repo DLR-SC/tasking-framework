@@ -25,7 +25,7 @@
 #define TASKING_TASK_BARRIER_H_
 
 #include "taskChannel.h"
-#include <mutex.h>
+#include "taskUtils.h"
 
 namespace Tasking
 {

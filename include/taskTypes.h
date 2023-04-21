@@ -20,7 +20,6 @@
 #define TASKTYPES_H_
 
 #include <cstdlib>
-#include <cstddef>
 #include <stdint.h>
 #include <limits>
 

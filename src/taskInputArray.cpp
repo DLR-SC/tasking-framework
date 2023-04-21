@@ -17,17 +17,15 @@
  */
 
 #include <assert.h>
-#include <cstddef>
 #include "taskInputArray.h"
 
-Tasking::InputArray::InputArray(Input* inputMemory, size_t p_size) : impl(inputMemory, p_size)
+Tasking::InputArray::InputArray(Input* inputMemory, size_t p_size) : impl(inputMemory, p_size), condition(nullptr)
 {
 }
 
 //-------------------------------------
 
-const Tasking::Input&
-Tasking::InputArray::operator[](unsigned int index) const
+const Tasking::Input& Tasking::InputArray::operator[](unsigned int index) const
 {
     assert(index < impl.length);
     return impl.inputs[index];
@@ -35,8 +33,7 @@ Tasking::InputArray::operator[](unsigned int index) const
 
 //-------------------------------------
 
-Tasking::Input&
-Tasking::InputArray::operator[](unsigned int index)
+Tasking::Input& Tasking::InputArray::operator[](unsigned int index)
 {
     assert(index < impl.length);
     return impl.inputs[index];
@@ -69,29 +66,58 @@ bool
 Tasking::InputArray::isActivated(void) const
 {
 
-    bool activate = true;
-    bool final = false; // exit condition if an activated final input is found
+    bool activate;
+    unsigned int lastChecked = impl.length;
 
-    for (unsigned int i = 0; !final && (i < impl.length); i++)
+    if (nullptr == condition)
     {
-        if (!impl.inputs[i].isActivated())
+        // No alternative condition
+        activate = true;
+        for (unsigned int i = 0; i < impl.length; ++i)
         {
-            // Change activation state only when the input is not a final and optional input
-            if ((!impl.inputs[i].isFinal()) && (!impl.inputs[i].isOptional()))
+            if (!impl.inputs[i].isActivated())
             {
-                activate = false; // First not activated input leads to false.
-                                  // Only an active final input can change this result.
+                // Change activation state only when the input is not a final and optional input
+                if ((!impl.inputs[i].isFinal()) && (!impl.inputs[i].isOptional()))
+                {
+                    // First not activated input leads to false.
+                    activate = false;
+                    // Remaining inputs need a check on activated and final input
+                    lastChecked = i;
+                    break; // Further search is not meaningful, end loop
+                }
             }
-        }
-        else
+            else
+            {
+                if (impl.inputs[i].isFinal())
+                {
+                    break; // end loop over inputs if activated and final input is found.
+                }
+            }
+        } // end for over inputs
+    }
+    else
+    {
+        // Alternative condition is set
+        activate = condition(*this);
+        // If not activated by condition check all inputs on final flag
+        if (!activate)
         {
-            if (impl.inputs[i].isFinal())
-            {
-                final = true; // if a final activated input is found, we are finished
-                activate = true;
-            }
+            lastChecked = 0u;
         }
     }
+
+    // Check remaining inputs on final. If activated by normal condition last check is equal to length.
+    for (unsigned int i = lastChecked + 1u; i < impl.length; ++i)
+    {
+        if (impl.inputs[i].isActivated() && impl.inputs[i].isFinal())
+        {
+            // Found activated final input
+            activate = true;
+            break;
+        }
+    }
+
     return activate;
 }
 
@@ -115,6 +141,14 @@ Tasking::InputArray::connectTask(TaskImpl& task)
     {
         impl.inputs[i].connectTask(task);
     }
+}
+
+//-------------------------------------
+
+void
+Tasking::InputArray::setCondition(BooleanFunction alternativeCondition)
+{
+    condition = alternativeCondition;
 }
 
 // ====================================

@@ -25,13 +25,13 @@ Tasking::SchedulePolicyPriority::Settings::Settings(Priority p_priority) : prior
 
 // ----------------
 
-Tasking::SchedulePolicyPriority::ManagementData::ManagementData(Settings setting) : settings(setting), next(NULL)
+Tasking::SchedulePolicyPriority::ManagementData::ManagementData(Settings setting) : settings(setting), next(nullptr)
 {
 }
 
 // ----------------
 
-Tasking::SchedulePolicyPriority::SchedulePolicyPriority(void) : head(NULL)
+Tasking::SchedulePolicyPriority::SchedulePolicyPriority(void) : head(nullptr)
 {
 }
 
@@ -46,7 +46,7 @@ Tasking::SchedulePolicyPriority::queue(Tasking::TaskImpl& task)
     queueMutex.enter();
 
     // Check if queue is empty
-    if (head != NULL)
+    if (head != nullptr)
     { // Non empty queue
         isEmpty = false;
         // Check if head element must replaced
@@ -59,7 +59,7 @@ Tasking::SchedulePolicyPriority::queue(Tasking::TaskImpl& task)
         { // Search position in the queue
             TaskImpl* previous = head;
             TaskImpl* next = static_cast<ManagementData*>(previous->policyData)->next;
-            while ((next != NULL) &&
+            while ((next != nullptr) &&
                    (taskData->settings.priority <= static_cast<ManagementData*>(next->policyData)->settings.priority))
             {
                 previous = next;
@@ -72,7 +72,7 @@ Tasking::SchedulePolicyPriority::queue(Tasking::TaskImpl& task)
     }
     else
     { // Empty queue
-        taskData->next = NULL;
+        taskData->next = nullptr;
         head = &task;
     }
 
@@ -89,7 +89,7 @@ Tasking::SchedulePolicyPriority::nextTask(void)
 
     // Get head element and correct it
     TaskImpl* next = head;
-    if (head != NULL)
+    if (head != nullptr)
     {
         head = static_cast<ManagementData*>(head->policyData)->next;
     }

@@ -19,8 +19,8 @@
 #ifndef TASKING_INCLUDE_CLOCK_H_
 #define TASKING_INCLUDE_CLOCK_H_
 
-#include "taskEvent.h"
-#include <mutex.h>
+#include "../taskEvent.h"
+#include "../taskUtils.h"
 
 namespace Tasking
 {
@@ -128,10 +128,10 @@ public:
     EventImpl* readFirstPending(void);
 
     /**
-     *  @return The time between head of the clock queue and the next different time point in the clock queue.
-     * If there is no further time point in the clock queue or the clock queue is empty, the method return 0.
+     *  @return The time of the first event in the queue with start time in the future.
+     *  @see nonPendingHead
      */
-    Time getNextGapTime(void) const;
+    Time getNextStartTime(void);
 
     /**
      * @return Wake up time point of the clock queue head. If the clock queue is empty, the method return 0.
@@ -145,10 +145,13 @@ public:
     mutable Mutex timeQueueMutex;
 
     /// Flag to indicate if still in mutex.
-    bool inTimeQueueMutex;
+    volatile bool inTimeQueueMutex;
 
     /// Mutex to protect change of pair timeQueueMutex and inTimeQueueMutex.
     mutable Mutex timeQueueMutexMutex;
+
+    /// Flag to indicate that a next pointer inside the clock queue was modified
+    volatile bool nextInQueueModified;
 
     /**
      * Pointer to the clock queue head. This event has the earliest absolute wake up time or the same time like an
@@ -161,6 +164,12 @@ public:
      * event enqueued after.
      */
     EventImpl* queueTail;
+
+    /**
+     * Point to the first event in the clock queue after request the next start time.
+     * @see getNextStartTime
+     */
+    EventImpl* nonePendingHead;
 };
 
 } // namespace Tasking

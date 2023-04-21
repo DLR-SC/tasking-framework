@@ -19,7 +19,6 @@
 #ifndef TASKINPUT_H_
 #define TASKINPUT_H_
 
-#include <mutex.h>
 #include "impl/taskInput_impl.h"
 
 namespace Tasking
@@ -88,10 +87,10 @@ public:
 
     /**
      * Configure input synchronization as on. If synchronization is on and the input is activated, the reset operation
-     * consumes only the number of expected activations. No notifications are lost when the input is activated and the
+     * consumes only the number of expected notifications. No notifications are lost when the input is activated and the
      * reset operation is not executed for this activation cycle. If enough notifications have been received when the
      * reset operation is started, the input get's immediately activated directly after the reset operation.
-     * E.g. if activations is set to two and five notifications happens without
+     * E.g. if activation threshold is set to two and five notifications happens without
      * the reset operation, the input is activated directly again by the reset operation. After the next
      * reset operation the input will wait for a further notification to get activated.
      *
@@ -132,7 +131,8 @@ public:
     void connectTask(TaskImpl& task);
 
     /**
-     * Reset the activation state to 0 activations.
+     * Reset the activation state to 0 notifications in non synchronous mode. If not in synchronous mode the
+     * notifications will be modified by pending notifications.
      */
     virtual void reset(void);
 
@@ -154,7 +154,7 @@ public:
     /**
      * Check if the input is configured as optional
      *
-     * @result True if the input is configured with zero arrival as activation threshold, else false.
+     * @result True if the input is configured with zero notifications as activation threshold, else false.
      */
     bool isOptional(void) const;
 
@@ -165,12 +165,20 @@ public:
     bool isValid(void) const;
 
     /**
-     * Request the number of activations since last reset of the task input.
-     * Special case: optional final input returns only true if an activation came
+     * Request the number of notifications since last reset of the task input.
+     * Special case: optional final input returns only true if activation state is requested.
      *
-     * @result Number of activations since last call to reset.
+     * @result Number of notifications since last call to reset.
      */
-    unsigned int getActivations(void) const;
+    unsigned int getNotifications(void) const;
+
+    /**
+     * Request the number of pending notifications in synchronous mode. If input is configured to
+     * asynchronous mode the result will always be zero.
+     *
+     * @result: Number of pending notifications in synchronous mode.
+     */
+    unsigned int getPendingNotifications(void) const;
 
     /**
      * Type safe request of a channel from a task input
@@ -181,6 +189,8 @@ public:
     ChannelType*
     getChannel(void) const
     {
+        static_assert(std::is_base_of<Tasking::Channel, ChannelType>::value,
+                      "channelType needs to be derived from Tasking::Channel");
         return static_cast<ChannelType*>(impl.getChannel());
     }
 

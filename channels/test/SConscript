@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+import os
+
+Import('envGlobal')
+
+env = envGlobal.Clone()
+
+files = env.Glob('*.cpp')
+
+env.Append(LIBS=['tasking', 'googletest', 'tasking-channels', 'pthread'])
+
+if env['PLATFORM'] == 'outpost':
+    env.Append(LIBS=['outpost_smpc', 'outpost_rtos', 'outpost_time', 'outpost_utils'])
+env.Append(LIBS=['rt'])
+
+# GoogleTest uses undefined symbols which would otherwise generate a lot of warnings
+env.RemoveFromList('CCFLAGS_warning', ['-Wundef'])
+
+program = env.Program('tasking_channels_test', files)
+
+Return('program')

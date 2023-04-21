@@ -20,7 +20,7 @@
 #define OTASKING_INCLUDE_SCHEDULEPOLICYFIFO_H_
 
 #include "schedulePolicy.h"
-#include <mutex.h>
+#include "taskUtils.h"
 
 namespace Tasking
 {

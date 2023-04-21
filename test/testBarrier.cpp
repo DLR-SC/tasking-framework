@@ -28,15 +28,16 @@ public:
     class CheckTask : public Tasking::TaskProvider<1u, Tasking::SchedulePolicyLifo>
     {
     public:
-        CheckTask(Tasking::Scheduler& scheduler) :
-                        TaskProvider(scheduler)
+        CheckTask(Tasking::Scheduler& scheduler) : TaskProvider(scheduler)
         {
             inputs[0].configure(1u);
         }
-        virtual void execute(void)
+        virtual void
+        execute(void)
         {
         }
-        bool isActivated(void) const
+        bool
+        isActivated(void) const
         {
             return inputs[0].isActivated();
         }
@@ -46,8 +47,7 @@ public:
     Tasking::SchedulerUnitTest scheduler;
     CheckTask task;
     Tasking::Barrier barrier;
-    TestBarrier(void) :
-                    scheduler(schedulePolicy), task(scheduler)
+    TestBarrier(void) : scheduler(schedulePolicy), task(scheduler)
     {
         task.configureInput(0u, barrier);
     }
@@ -91,7 +91,8 @@ TEST_F(TestBarrier, IncreaseMeantime)
     EXPECT_TRUE(task.isActivated());
 }
 
-TEST_F(TestBarrier, ResetValue) {
+TEST_F(TestBarrier, ResetValue)
+{
     Tasking::Barrier barrierReset(2);
     task.configureInput(0u, barrierReset);
     EXPECT_FALSE(task.isActivated());

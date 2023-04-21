@@ -22,7 +22,7 @@
 Tasking::Signaler::Signaler(void) : wakeUp(false)
 {
     int success;
-    success = pthread_cond_init(&blockCond, NULL);
+    success = pthread_cond_init(&blockCond, nullptr);
     assert(success == 0);
 }
 

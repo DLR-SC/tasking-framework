@@ -19,13 +19,13 @@
 #ifndef TASKING_INCLUDE_ARCH_LINUX_SIGNALER_H_
 #define TASKING_INCLUDE_ARCH_LINUX_SIGNALER_H_
 
-#include "mutex.h"
+#include "mutexImpl.h"
 
 namespace Tasking
 {
 
 /// A signaler based on the POSIX pthread conditional variables.
-class Signaler : public Mutex
+class Signaler : public MutexImpl
 {
 public:
     /// Initialize POSIX pthread conditional variable

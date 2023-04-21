@@ -1,3 +1,183 @@
+----- Start of revision 1.1 changes -----
+
+Olaf Maibaum Fri, 3 Mar 2023 13:30:44 +0100
+  [build]Add cff file to deployment
+
+Olaf Maibaum Fri, 3 Mar 2023 13:27:19 +0100
+  [doc]Update list of contributors
+
+Maibaum, Olaf Mon, 30 Jan 2023 09:56:45 +0000
+  [src]Clock::getNextGapTime Fix possible race condition
+
+Lüdtke, Daniel Fri, 13 Jan 2023 10:53:49 +0000
+  Resolve "Makefile: building also channels"
+
+Olaf Maibaum Fri, 12 Aug 2022 14:12:47 +0200
+  [format]taskInput Correct formatting
+
+Lund, Andreas Fri, 12 Aug 2022 11:46:32 +0000
+  [src]Text adjustment in static_assert
+
+Jungmann, Lea Thu, 11 Aug 2022 14:08:30 +0000
+  add filterExample to examples/SConscript
+
+Olaf Maibaum Wed, 10 Aug 2022 15:30:10 +0200
+  [src]DoubleBuffer Asser default constructable
+
+Olaf Maibaum Wed, 10 Aug 2022 15:15:36 +0200
+  [src]Expressivity of template names and asserts.
+
+Sommer, Jan Thu, 28 Jul 2022 07:22:25 +0000
+  [src]Utils unsigned is always integral
+
+Olaf Maibaum Wed, 27 Jul 2022 16:23:53 +0200
+  [src]Add static asserts on templates
+
+Olaf Maibaum Wed, 27 Jul 2022 14:36:22 +0200
+  [build]Add formatting of test files
+
+Olaf Maibaum Wed, 27 Jul 2022 11:04:18 +0200
+  [src]Replace NULL by nullptr
+
+Olaf Maibaum Wed, 27 Jul 2022 11:03:22 +0200
+  [build]Makefile add missing target test
+
+Olaf Maibaum Fri, 28 Jan 2022 15:53:21 +0100
+  [test]InputArray Add example for state machine path
+
+Olaf Maibaum Fri, 28 Jan 2022 15:16:11 +0100
+  [doc]InputArray name and comment changes
+
+Olaf Maibaum Wed, 19 Jan 2022 14:55:18 +0100
+  [doc]wiki Add alternative condition function
+
+Olaf Maibaum Wed, 19 Jan 2022 14:33:49 +0100
+  [src]InputArray provide alternative condition for activation
+
+Olaf Maibaum Mon, 25 Apr 2022 11:32:25 +0200
+  [doc]Adjust comment in test case getPendingNotifications.
+
+Olaf Maibaum Thu, 21 Apr 2022 14:27:51 +0200
+  [doc]Adjust comments for better understanding
+
+Olaf Maibaum Thu, 14 Apr 2022 15:22:05 +0200
+  [build]make Replace non-portable echo by printf.
+
+Maibaum, Olaf Mon, 7 Feb 2022 15:33:46 +0000
+  [doc]Add citation Information in CFF format
+
+Olaf Maibaum Thu, 3 Feb 2022 11:33:42 +0100
+  [build]Prepare library for static linkage with --gc-sections
+
+Olaf Maibaum Fri, 28 Jan 2022 15:53:21 +0100
+  [test]InputArray Add example for state machine path
+
+Olaf Maibaum Fri, 28 Jan 2022 15:16:11 +0100
+  [doc]InputArray name and comment changes
+
+Olaf Maibaum Wed, 19 Jan 2022 14:55:18 +0100
+  [doc]wiki Add alternative condition function
+
+Olaf Maibaum Wed, 19 Jan 2022 14:33:49 +0100
+  [src]InputArray provide alternative condition for activation
+
+Maibaum, Olaf Tue, 14 Dec 2021 14:27:50 +0000
+  Resolve "Handle compiler warning -Wclass-memaccess"
+
+Olaf Maibaum Fri, 3 Dec 2021 11:43:44 +0100
+  [src]taskUtil: Correct types and magic numbers
+
+Olaf Maibaum Thu, 2 Dec 2021 16:48:56 +0100
+  [src]taskUtil Bring converter templates to header scope.
+
+Olaf Maibaum Thu, 2 Dec 2021 15:45:11 +0100
+  [src]taskUtil: Template for ID conversions instead of unstable cast
+
+Olaf Maibaum Thu, 18 Nov 2021 15:43:54 +0100
+  [style]Fix wrong formatted files
+
+Olaf Maibaum Thu, 18 Nov 2021 15:33:58 +0100
+  [CI]Load clang module for clang-format
+
+Olaf Maibaum Thu, 18 Nov 2021 15:21:24 +0100
+  [CI]Add check on format
+
+Olaf Maibaum Thu, 18 Nov 2021 13:59:56 +0100
+  [doc]Wiki: Change getActivation to getNotifications
+
+Olaf Maibaum Thu, 18 Nov 2021 11:30:52 +0100
+  [fix]Utils: Encapsulate TestTask definition in test fictureD
+
+Olaf Maibaum Thu, 18 Nov 2021 09:53:43 +0100
+  [src]Utils: Provide IdConverter class
+
+Olaf Maibaum Wed, 17 Nov 2021 16:20:29 +0100
+  [style]Format test cases with scons build
+
+Olaf Maibaum Wed, 17 Nov 2021 16:02:25 +0100
+  [src]TaskInput: Rename arrival with notification
+
+Moyano, Gabriel Mon, 25 Oct 2021 10:27:00 +0200
+  [build]Add filterExample into build system
+
+Moyano, Gabriel Mon, 25 Oct 2021 10:25:07 +0200
+  [examples]Add filterExample
+
+Prat i Sala, Arnau Thu, 28 Oct 2021 15:43:40 +0000
+  [build] CMake: Fix name for library
+
+Olaf Maibaum Fri, 29 Oct 2021 15:00:16 +0200
+  [build]Makefile target examples (pull request by Gabriel M.
+
+Maibaum, Olaf Mon, 21 Jun 2021 11:52:20 +0000
+  [doc]Input Spelling fixes
+
+Olaf Maibaum Mon, 21 Jun 2021 09:00:17 +0200
+  [src]Input Consistency of activations at mode switch
+
+Olaf Maibaum Fri, 18 Jun 2021 16:29:30 +0200
+  [src]Input Getter for pending activations
+
+Olaf Maibaum Fri, 18 Jun 2021 16:28:42 +0200
+  [doc]SingleBuffer Linebreak by clang-format
+
+Olaf Maibaum Fri, 18 Jun 2021 16:27:42 +0200
+  [git] Ignore autotools
+
+Sommer, Jan Mon, 7 Jun 2021 09:11:13 +0000
+  channels: Make print Python3 compatible
+
+Sommer, Jan Mon, 22 Mar 2021 16:45:22 +0100
+  scons: Use Python3 compliant print
+
+Maibaum, Olaf Fri, 19 Mar 2021 11:24:56 +0100
+  [src] Implement double buffer channel
+
+Maibaum, Olaf Fri, 19 Mar 2021 11:23:04 +0100
+  Resolve "Single buffer channel"
+
+Olaf Maibaum Wed, 6 Jan 2021 15:28:49 +0100
+  [fix]Mutex Platform specific changes not applied to custom example
+
+Olaf Maibaum Wed, 6 Jan 2021 15:01:34 +0100
+  [build]Apply clang-format on channel
+
+Olaf Maibaum Wed, 6 Jan 2021 14:39:41 +0100
+  [build]cmake Update renaming of mutex to mutexImpl
+
+Olaf Maibaum Wed, 6 Jan 2021 14:32:34 +0100
+  [src]Provide Mutex at API (Wrapper to implementation specific Mutex)
+
+Olaf Maibaum Fri, 4 Dec 2020 13:34:30 +0100
+  [deploy]github/gitmodule Change to htpps address
+
+Olaf Maibaum Mon, 16 Nov 2020 13:44:28 +0100
+  [fix]getTaskIdFromName check on empty string This check prevent a non deterministic 32 bit shift left at line 36
+
+Olaf Maibaum Fri, 13 Nov 2020 16:09:02 +0100
+  [deploy]Fix issues during deploy
+
+----- End of revision 1.1 changes -----
 ----- Start of revision 1.0.1 changes -----
 
 Olaf Maibaum Tue, 3 Nov 2020 11:34:13 +0100

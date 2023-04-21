@@ -66,6 +66,24 @@ Tasking::Input::setSynchron(bool syncState)
 {
     // For optional inputs, no synchronization is available
     impl.m_synchron = syncState && (impl.m_activationThreshold > 0u);
+    // In one task run the task consumes in synchronous mode only the threshold value, in asynchronous mode all messages
+    if (impl.m_synchron)
+    {
+        // When the input has enough notification to activate a task, ...
+        if (impl.m_notifications > impl.m_activationThreshold)
+        {
+            // ... distribute the notifications on pending ones and the one which had activate the task.
+            impl.m_missedNotifications = impl.m_notifications - impl.m_activationThreshold;
+            impl.m_notifications = impl.m_activationThreshold;
+        }
+    }
+    else
+    {
+        // In asynchronous mode there are no missed notifications.
+        // Adjust values to the expected state as with all notifications in asynchronous mode.
+        impl.m_notifications += impl.m_missedNotifications;
+        impl.m_missedNotifications = 0u;
+    }
 }
 
 //-------------------------------------
@@ -112,26 +130,26 @@ Tasking::Input::reset(void)
     {
         impl.m_mutex.enter();
         // Check if a new activation of a connected task should happen by the missed activation calls.
-        if ((impl.m_missedActivations >= impl.m_activationThreshold))
+        if ((impl.m_missedNotifications >= impl.m_activationThreshold))
         {
             // Activation is necessary, so overtake the new bunch of activations and activate the task.
-            impl.m_missedActivations -= impl.m_activationThreshold;
-            impl.m_activations = impl.m_activationThreshold;
+            impl.m_missedNotifications -= impl.m_activationThreshold;
+            impl.m_notifications = impl.m_activationThreshold;
             impl.m_mutex.leave();
             impl.m_task->activate();
         }
         else
         {
             // No activation is necessary
-            impl.m_activations = impl.m_missedActivations;
-            impl.m_missedActivations = 0u;
+            impl.m_notifications = impl.m_missedNotifications;
+            impl.m_missedNotifications = 0u;
             impl.m_mutex.leave();
         }
     }
     else
     {
         // Not synchronized, only reset activations.
-        impl.m_activations = 0;
+        impl.m_notifications = 0;
     }
 }
 
@@ -145,11 +163,11 @@ Tasking::Input::isActivated(void) const
     // First case: optional input marked as final, activate only if push came
     if (impl.m_final && (impl.m_activationThreshold == 0))
     {
-        isActive = (impl.m_activations > 0);
+        isActive = (impl.m_notifications > 0);
     }
     else
     {
-        isActive = (impl.m_activations >= impl.m_activationThreshold);
+        isActive = (impl.m_notifications >= impl.m_activationThreshold);
     }
     return isActive;
 }
@@ -182,9 +200,17 @@ Tasking::Input::isValid(void) const
 //-------------------------------------
 
 unsigned int
-Tasking::Input::getActivations(void) const
+Tasking::Input::getNotifications(void) const
 {
-    return impl.m_activations;
+    return impl.m_notifications;
+}
+
+//-------------------------------------
+
+unsigned int
+Tasking::Input::getPendingNotifications(void) const
+{
+    return impl.m_missedNotifications;
 }
 
 //-------------------------------------
@@ -203,8 +229,8 @@ Tasking::InputImpl::InputImpl(Tasking::Input& api) :
     m_channel(nullptr),
     m_final(false),
     m_synchron(false),
-    m_activations(0),
-    m_missedActivations(0u),
+    m_notifications(0),
+    m_missedNotifications(0u),
     m_activationThreshold(uninitialized),
     channelNextInput(nullptr)
 {
@@ -220,12 +246,12 @@ Tasking::InputImpl::notifyInput(void)
         m_mutex.enter();
         if (parent.isActivated())
         {
-            ++m_missedActivations;
+            ++m_missedNotifications;
             m_mutex.leave();
         }
         else
         {
-            ++m_activations;
+            ++m_notifications;
             m_mutex.leave();
             if (parent.isActivated())
             {
@@ -236,7 +262,8 @@ Tasking::InputImpl::notifyInput(void)
     }
     else
     {
-        ++m_activations;
+        // Not synchronized
+        ++m_notifications;
         if (parent.isActivated())
         {
             // Activation is reached, try to activate the task
@@ -253,7 +280,7 @@ Tasking::Input::synchronizeStart(void)
     if (impl.m_channel != nullptr)
     {
         static_cast<UnprotectedChannelAccess*>(impl.m_channel)
-                ->synchronizeStart(&impl.m_task->parent, impl.m_activations);
+                ->synchronizeStart(&impl.m_task->parent, impl.m_notifications);
     }
 }
 

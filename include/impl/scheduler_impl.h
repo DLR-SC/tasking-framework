@@ -19,9 +19,9 @@
 #ifndef TASKING_INCLUDE_IMPL_SCHEDULER_IMPL_H_
 #define TASKING_INCLUDE_IMPL_SCHEDULER_IMPL_H_
 
-#include "schedulePolicy.h"
-#include "impl/clock_impl.h"
-#include <mutex.h>
+#include "../schedulePolicy.h"
+#include "clock_impl.h"
+#include "../taskUtils.h"
 
 namespace Tasking
 {

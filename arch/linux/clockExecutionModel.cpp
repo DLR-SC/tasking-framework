@@ -52,7 +52,8 @@ extern "C"
                     // Signal the scheduler, it will perform pending events
                     static_cast<SchedulerExecutionModel*>(&(clock->scheduler))->signal();
                     // Adjust wake-up time for next sleep
-                    clock->computeAbsoluteWakeUpTime(clock->getNextGapTime());
+                    Tasking::Time timeSpan = clock->getNextStartTime() - clock->getTime();
+                    clock->computeAbsoluteWakeUpTime(timeSpan);
                 }
             } // end of loop over not empty clock event list
         } // end of loop over waiting on empty clock list
@@ -61,7 +62,7 @@ extern "C"
         pthread_mutex_unlock(&(clock->m_mutex));
 
         // Terminate thread
-        pthread_exit(NULL);
+        pthread_exit(nullptr);
         //    return NULL; // Dead code by pthread_exit, but gives warning
     }
 } // extern "C"
@@ -79,9 +80,9 @@ Tasking::ClockExecutionModel::ClockExecutionModel(Scheduler& p_scheduler) : Cloc
     wakeUpTime.tv_nsec = 0;
 
     // Set up mutex, conditional variable and start thread
-    int state = pthread_mutex_init(&m_mutex, NULL);
-    state |= pthread_cond_init(&m_cond, NULL);
-    state |= pthread_create(&m_thread, NULL, clockThread, this);
+    int state = pthread_mutex_init(&m_mutex, nullptr);
+    state |= pthread_cond_init(&m_cond, nullptr);
+    state |= pthread_create(&m_thread, nullptr, clockThread, this);
     assert(state == 0);
     // Check start of the thread to prevent running condition. It must be inside the conditional wait to continue
     pthread_mutex_lock(&m_mutex);
@@ -92,7 +93,7 @@ Tasking::ClockExecutionModel::ClockExecutionModel(Scheduler& p_scheduler) : Cloc
         struct timespec sleeptime;
         sleeptime.tv_sec = 0;
         sleeptime.tv_nsec = 1000;
-        nanosleep(&sleeptime, NULL);
+        nanosleep(&sleeptime, nullptr);
         pthread_mutex_lock(&m_mutex);
     }
     pthread_mutex_unlock(&m_mutex);
@@ -107,7 +108,7 @@ Tasking::ClockExecutionModel::~ClockExecutionModel(void)
     // Wake up thread
     pthread_cond_signal(&m_cond);
     // Wait on termination of the thread
-    pthread_join(m_thread, NULL);
+    pthread_join(m_thread, nullptr);
     pthread_detach(m_thread);
     // Destroy conditional variable and mutex
     pthread_cond_destroy(&m_cond);

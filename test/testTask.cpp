@@ -28,9 +28,7 @@
 class TestTask : public ::testing::Test
 {
 public:
-
-    TestTask(void) :
-                    scheduler(policy), checker(scheduler)
+    TestTask(void) : scheduler(policy), checker(scheduler)
     {
         // input 1 is not used in every test case, don't add it here. Add it in test case
         checker.configureInput(0, msg[0]);
@@ -43,15 +41,15 @@ public:
     class CheckChannel : public Tasking::Channel
     {
     public:
-        CheckChannel(void) :
-                        Channel(1), resets(0)
+        CheckChannel(void) : Channel(1), resets(0)
         {
             // Nothing else to do.
         }
 
         using Tasking::Channel::push;
 
-        virtual void reset(void)
+        virtual void
+        reset(void)
         {
             ++resets;
         }
@@ -62,31 +60,32 @@ public:
     class CheckTask : public Tasking::TaskProvider<2u, Tasking::SchedulePolicyLifo>
     {
     public:
-        CheckTask(Tasking::Scheduler& scheduler, const Tasking::TaskId id = 0u) :
-                        TaskProvider(scheduler, id), calls(0)
+        CheckTask(Tasking::Scheduler& scheduler, const Tasking::TaskId id = 0u) : TaskProvider(scheduler, id), calls(0)
         {
             // Configurate input settings
             inputs[0].configure(1u);
             inputs[1].configure(0u);
         }
 
-        CheckTask(Tasking::Scheduler& scheduler, const char *taskName) :
-                        TaskProvider(scheduler, taskName), calls(0)
+        CheckTask(Tasking::Scheduler& scheduler, const char* taskName) : TaskProvider(scheduler, taskName), calls(0)
         {
         }
 
         /// Overload execute to count executions
-        void execute(void)
+        void
+        execute(void)
         {
             calls++;
         }
         /// Provide call to protected method getInput.
         using Tasking::TaskProvider<2u, Tasking::SchedulePolicyLifo>::inputs;
-        const Tasking::Input& getInput(unsigned int id)
+        const Tasking::Input&
+        getInput(unsigned int id)
         {
             return inputs[id];
         }
-        CheckChannel* getChannel(unsigned int key) const
+        CheckChannel*
+        getChannel(unsigned int key) const
         {
             return Task::getChannel<CheckChannel>(key);
         }
@@ -94,17 +93,19 @@ public:
         int calls;
     };
 
-    class NameCheckTask: public Tasking::Task
+    class NameCheckTask : public Tasking::Task
     {
     public:
-        NameCheckTask(Tasking::Scheduler& scheduler, const char *taskName) :
-            Task(scheduler, policy, inputs, taskName)
-    {
-    }
-    protected:
-        void execute(void) override
+        NameCheckTask(Tasking::Scheduler& scheduler, const char* taskName) : Task(scheduler, policy, inputs, taskName)
         {
         }
+
+    protected:
+        void
+        execute(void) override
+        {
+        }
+
     private:
         /// Scheduling policy
         Tasking::SchedulePolicyLifo::ManagementData policy;
@@ -124,21 +125,20 @@ TEST_F(TestTask, configure)
 {
     CheckTask task(scheduler);
     EXPECT_FALSE(task.isValid());
-    EXPECT_EQ(NULL, task.getInput(0u).getChannel<CheckChannel>());
-    EXPECT_EQ(NULL, task.getChannel(0u));
+    EXPECT_EQ(nullptr, task.getInput(0u).getChannel<CheckChannel>());
+    EXPECT_EQ(nullptr, task.getChannel(0u));
     task.configureInput(0u, msg[0]);
     EXPECT_FALSE(task.isValid());
     EXPECT_EQ(msg, task.getInput(0u).getChannel<CheckChannel>());
-    EXPECT_EQ(NULL, task.getInput(1u).getChannel<CheckChannel>());
+    EXPECT_EQ(nullptr, task.getInput(1u).getChannel<CheckChannel>());
     EXPECT_EQ(msg, task.getChannel(0u));
-    EXPECT_EQ(NULL, task.getChannel(1u));
+    EXPECT_EQ(nullptr, task.getChannel(1u));
     task.configureInput(1u, msg[1]);
     EXPECT_TRUE(task.isValid());
     EXPECT_EQ(msg, task.getInput(0u).getChannel<CheckChannel>());
     EXPECT_EQ(msg + 1, task.getInput(1u).getChannel<CheckChannel>());
     EXPECT_EQ(msg, task.getChannel(0u));
     EXPECT_EQ(msg + 1, task.getChannel(1u));
-
 }
 
 TEST_F(TestTask, reset)
@@ -151,7 +151,7 @@ TEST_F(TestTask, reset)
     EXPECT_FALSE(checker.getInput(0).isActivated());
     EXPECT_EQ(1, msg[0].resets);
     EXPECT_TRUE(checker.getInput(1).isActivated());
-    EXPECT_EQ(0u, checker.getInput(1).getActivations());
+    EXPECT_EQ(0u, checker.getInput(1).getNotifications());
     EXPECT_EQ(1, msg[1].resets);
 }
 
@@ -216,7 +216,7 @@ TEST_F(TestTask, testTaskName)
     NameCheckTask task(scheduler, "_6.U");
     char name[5];
     Tasking::convertTaskIdToString(task.getTaskId(), name, 5);
-    EXPECT_TRUE((strncmp(name, "_6.U", 5)==0));
+    EXPECT_TRUE((strncmp(name, "_6.U", 5) == 0));
     Tasking::convertTaskIdToString(task.getTaskId(), name, 4);
-    EXPECT_TRUE((strncmp(name, "_6.", 5)==0));
+    EXPECT_TRUE((strncmp(name, "_6.", 5) == 0));
 }

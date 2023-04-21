@@ -55,7 +55,7 @@ Tasking::Scheduler::start(bool doReset)
     if (doReset)
     {
         // Reset all associated tasks
-        for (TaskImpl* task = impl.associatedTasks; (task != NULL); task = task->nextTaskAtScheduler)
+        for (TaskImpl* task = impl.associatedTasks; (task != nullptr); task = task->nextTaskAtScheduler)
         {
             // Doing a reset if option is set
             task->parent.reset();
@@ -63,7 +63,7 @@ Tasking::Scheduler::start(bool doReset)
     }
     else
     { // No reset is performed, for this case check activations state of tasks and start them if activated
-        for (TaskImpl* task = impl.associatedTasks; (task != NULL); task = task->nextTaskAtScheduler)
+        for (TaskImpl* task = impl.associatedTasks; (task != nullptr); task = task->nextTaskAtScheduler)
         {
             // If reset option is not set, check if tasks are activated and start them
             if (task->inputs.isActivated())
@@ -82,7 +82,7 @@ Tasking::Scheduler::terminate(bool doNotRemovePendingTasks)
     impl.running = false;
     // If clean up is needed read tasks from run queue until it is empty
     impl.clock.dequeueAll();
-    while (!doNotRemovePendingTasks && (NULL != impl.policy.nextTask()))
+    while (!doNotRemovePendingTasks && (nullptr != impl.policy.nextTask()))
         ;
     // Wait until running tasks are terminated.
     waitUntilEmpty();
@@ -93,7 +93,7 @@ Tasking::Scheduler::terminate(bool doNotRemovePendingTasks)
 void
 Tasking::Scheduler::initialize(void)
 {
-    for (TaskImpl* task = impl.associatedTasks; task != NULL; task = task->nextTaskAtScheduler)
+    for (TaskImpl* task = impl.associatedTasks; task != nullptr; task = task->nextTaskAtScheduler)
     {
         static_cast<UnprotectedTaskAccess&>(task->parent).initialize();
     }
@@ -102,7 +102,7 @@ Tasking::Scheduler::initialize(void)
 // ====================================
 
 Tasking::SchedulerImpl::SchedulerImpl(Scheduler& scheduler, SchedulePolicy& schedulePolicy, Clock& p_clock) :
-    parent(scheduler), policy(schedulePolicy), associatedTasks(NULL), clock(p_clock), running(false)
+    parent(scheduler), policy(schedulePolicy), associatedTasks(nullptr), clock(p_clock), running(false)
 {
     // Nothing else to do
 }
@@ -136,7 +136,7 @@ void
 Tasking::SchedulerImpl::handleEvents(void)
 {
     EventImpl* event = clock.readFirstPending();
-    while (event != NULL)
+    while (event != nullptr)
     {
         event->handle();
         event = clock.readFirstPending();

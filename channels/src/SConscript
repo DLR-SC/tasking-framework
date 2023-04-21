@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+
+import os
+
+Import('envGlobal')
+
+envGlobal.Append(CPPPATH=[os.path.abspath('../include')])
+
+env = envGlobal.Clone()
+
+files = env.Glob('*.cpp')
+
+if 'FORMAT' in envGlobal:
+  print("Format channel source files.")
+  os.system('clang-format -style=file -i *.cpp ../include/channels/*.h ../test/*.cpp')
+
+library = env.StaticLibrary(target = 'tasking-channels', source = files)
+envGlobal.Install(env['LIBINSTALLPATH'], library)
+Return('library')

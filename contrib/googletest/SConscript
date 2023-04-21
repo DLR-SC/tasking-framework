@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+import os
+
+Import('envGlobal')
+
+# As other sibling repos may already contain GTest
+if not 'GTEST_EXISTS' in envGlobal:
+    envGlobal['GTEST_EXISTS'] = 1
+    envGlobal.Append(CCFLAGS=('-I'+os.path.abspath('include')))
+
+    env = envGlobal.Clone()
+    env['CCFLAGS_warning'] = []
+    # Need to find the cc files for includes (Nasty programming technique in goolgeTest)
+    envGlobal.Append(CCFLAGS=('-I'+os.path.abspath('.')))
+    
+    # GoogleTest uses undefined symbols which would otherwise generate a lot of warnings
+    if envGlobal['GTEST_SUPPORT_NEEDED'] == 'yes':
+        envGlobal.RemoveFromList('CCFLAGS_warning', ['-Wundef'])
+
+    files = ['src/gtest-all.cc', 'src/gtest_main.cc']
+    
+    library = env.StaticLibrary('googletest', files)
+    envGlobal.Install(env['LIBINSTALLPATH'], library)
+

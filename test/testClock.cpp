@@ -25,19 +25,20 @@
 class TestClock : public ::testing::Test
 {
 public:
-
     class TestScheduler : public Tasking::Scheduler
     {
     public:
         TestScheduler(Tasking::SchedulePolicy& schedulePolicy, Tasking::Clock& pClock) :
-                        Scheduler(schedulePolicy, pClock), signalCount(0)
+            Scheduler(schedulePolicy, pClock), signalCount(0)
         {
         }
-        virtual void signal(void)
+        virtual void
+        signal(void)
         {
             ++signalCount;
         }
-        virtual void waitUntilEmpty(void)
+        virtual void
+        waitUntilEmpty(void)
         {
         }
         virtual void setZeroTime(Tasking::Time)
@@ -52,16 +53,17 @@ public:
     public:
         // Mockup implementation, which is in normal case private part of event and not accessible
         Tasking::EventImpl impl;
-        TestEvent(Tasking::Scheduler& scheduler, Tasking::Time time = 0u) :
-                        Event(scheduler), impl(*this, scheduler)
+        TestEvent(Tasking::Scheduler& scheduler, Tasking::Time time = 0u) : Event(scheduler), impl(*this, scheduler)
         {
             impl.nextActivation_ms = time;
         }
-        Tasking::EventImpl* getNext(void) const
+        Tasking::EventImpl*
+        getNext(void) const
         {
             return impl.next;
         }
-        Tasking::EventImpl* getPrevious(void) const
+        Tasking::EventImpl*
+        getPrevious(void) const
         {
             return impl.previous;
         }
@@ -71,27 +73,28 @@ public:
     class ClockImplementation : public Tasking::Clock
     {
     public:
-        ClockImplementation(Tasking::Scheduler& p_scheduler) :
-                        Clock(p_scheduler), now(0u), waitingTime(0u)
+        ClockImplementation(Tasking::Scheduler& p_scheduler) : Clock(p_scheduler), now(0u), waitingTime(0u)
         {
         }
-        virtual Tasking::Time getTime(void) const
+        virtual Tasking::Time
+        getTime(void) const
         {
             return now;
         }
-        virtual void startTimer(Tasking::Time timeSpan)
+        virtual void
+        startTimer(Tasking::Time timeSpan)
         {
             waitingTime = timeSpan;
         }
-        using Tasking::Clock::startAt;
-        using Tasking::Clock::startIn;
-        using Tasking::Clock::enqueue;
-        using Tasking::Clock::enqueueHead;
         using Tasking::Clock::dequeue;
         using Tasking::Clock::dequeueAll;
-        using Tasking::Clock::readFirstPending;
-        using Tasking::Clock::getNextGapTime;
+        using Tasking::Clock::enqueue;
+        using Tasking::Clock::enqueueHead;
         using Tasking::Clock::getHeadTime;
+        using Tasking::Clock::getNextStartTime;
+        using Tasking::Clock::readFirstPending;
+        using Tasking::Clock::startAt;
+        using Tasking::Clock::startIn;
         Tasking::Time now;
         Tasking::Time waitingTime;
     };
@@ -101,12 +104,11 @@ public:
     ClockImplementation clock;
     TestEvent* events[9];
 
-    TestClock(void) :
-                    scheduler(policy, clock), clock(scheduler)
+    TestClock(void) : scheduler(policy, clock), clock(scheduler)
     {
         for (int i = 0; i < 9; ++i)
         {
-            events[i] = NULL;
+            events[i] = nullptr;
         }
     }
 
@@ -114,7 +116,7 @@ public:
     {
         for (int i = 0; i < 9; ++i)
         {
-            if (events[i] != NULL)
+            if (events[i] != nullptr)
             {
                 delete events[i];
             }
@@ -122,7 +124,8 @@ public:
     }
 
     /// Three events at time point 1, 3, and 5
-    void prepareFilledQueue(void)
+    void
+    prepareFilledQueue(void)
     {
         int i = 0;
         for (Tasking::Time t = 1u; t < 6; t = t + 2)
@@ -142,7 +145,7 @@ TEST_F(TestClock, NoPendingEventAfterInstantiation)
     EXPECT_TRUE(clock.isEmtpy());
     EXPECT_FALSE(clock.isPending());
     EXPECT_EQ(0u, clock.getHeadTime());
-    EXPECT_TRUE(NULL == clock.readFirstPending());
+    EXPECT_TRUE(nullptr == clock.readFirstPending());
 }
 
 TEST_F(TestClock, EnqueueHead)
@@ -167,7 +170,7 @@ TEST_F(TestClock, EnqueueHead)
     EXPECT_TRUE(&event1.impl == clock.readFirstPending());
     EXPECT_TRUE(clock.isEmtpy());
     EXPECT_FALSE(clock.isPending());
-    EXPECT_TRUE(NULL == clock.readFirstPending());
+    EXPECT_TRUE(nullptr == clock.readFirstPending());
 }
 
 TEST_F(TestClock, EnqueueHeadRunningCondition)
@@ -251,7 +254,7 @@ TEST_F(TestClock, EnqueueSeveralElements)
     EXPECT_TRUE(clock.isPending());
     EXPECT_TRUE(&event3a.impl == clock.readFirstPending());
     EXPECT_FALSE(clock.isPending());
-    EXPECT_TRUE(NULL == clock.readFirstPending());
+    EXPECT_TRUE(nullptr == clock.readFirstPending());
     EXPECT_EQ(0u, clock.getHeadTime());
     TestEvent event3b(scheduler, 3u);
     clock.enqueue(event3b.impl);
@@ -282,10 +285,10 @@ TEST_F(TestClock, dequeueHead)
     prepareFilledQueue();
     clock.dequeue(events[0]->impl);
 
-    ASSERT_TRUE(events[0]->getNext() == NULL);
-    ASSERT_TRUE(events[0]->getPrevious() == NULL);
+    ASSERT_TRUE(events[0]->getNext() == nullptr);
+    ASSERT_TRUE(events[0]->getPrevious() == nullptr);
     ASSERT_TRUE(events[1]->getNext() == &(events[2]->impl));
-    ASSERT_TRUE(events[1]->getPrevious() == NULL);
+    ASSERT_TRUE(events[1]->getPrevious() == nullptr);
 
     clock.now = 10;
     for (unsigned int i = 1; i < 9; ++i)
@@ -300,9 +303,9 @@ TEST_F(TestClock, dequeueMidStart)
     clock.dequeue(events[3]->impl);
 
     ASSERT_TRUE(events[2]->getNext() == &(events[4]->impl));
-    ASSERT_TRUE(events[2]->getPrevious() == NULL);
-    ASSERT_TRUE(events[3]->getNext() == NULL);
-    ASSERT_TRUE(events[3]->getPrevious() == NULL);
+    ASSERT_TRUE(events[2]->getPrevious() == nullptr);
+    ASSERT_TRUE(events[3]->getNext() == nullptr);
+    ASSERT_TRUE(events[3]->getPrevious() == nullptr);
     ASSERT_TRUE(events[4]->getNext() == &(events[5]->impl));
     ASSERT_TRUE(events[4]->getPrevious() == &(events[2]->impl));
 
@@ -325,8 +328,8 @@ TEST_F(TestClock, dequeueMidMid)
 
     ASSERT_TRUE(events[3]->getNext() == &(events[5]->impl));
     ASSERT_TRUE(events[3]->getPrevious() == &(events[2]->impl));
-    ASSERT_TRUE(events[4]->getNext() == NULL);
-    ASSERT_TRUE(events[4]->getPrevious() == NULL);
+    ASSERT_TRUE(events[4]->getNext() == nullptr);
+    ASSERT_TRUE(events[4]->getPrevious() == nullptr);
     ASSERT_TRUE(events[5]->getNext() == &(events[6]->impl));
     ASSERT_TRUE(events[5]->getPrevious() == &(events[2]->impl));
 
@@ -349,8 +352,8 @@ TEST_F(TestClock, dequeueMidLast)
 
     ASSERT_TRUE(events[4]->getNext() == &(events[6]->impl));
     ASSERT_TRUE(events[4]->getPrevious() == &(events[2]->impl));
-    ASSERT_TRUE(events[5]->getNext() == NULL);
-    ASSERT_TRUE(events[5]->getPrevious() == NULL);
+    ASSERT_TRUE(events[5]->getNext() == nullptr);
+    ASSERT_TRUE(events[5]->getPrevious() == nullptr);
     ASSERT_TRUE(events[6]->getNext() == &(events[7]->impl));
     ASSERT_TRUE(events[6]->getPrevious() == &(events[4]->impl));
 
@@ -371,10 +374,10 @@ TEST_F(TestClock, dequeueTail)
     prepareFilledQueue();
     clock.dequeue(events[8]->impl);
 
-    ASSERT_TRUE(events[7]->getNext() == NULL);
+    ASSERT_TRUE(events[7]->getNext() == nullptr);
     ASSERT_TRUE(events[7]->getPrevious() == &(events[5]->impl));
-    ASSERT_TRUE(events[8]->getNext() == NULL);
-    ASSERT_TRUE(events[8]->getPrevious() == NULL);
+    ASSERT_TRUE(events[8]->getNext() == nullptr);
+    ASSERT_TRUE(events[8]->getPrevious() == nullptr);
 
     TestEvent event(scheduler, 2u);
     clock.enqueue(event.impl);
@@ -419,7 +422,7 @@ TEST_F(TestClock, startAtDelayed)
     EXPECT_EQ(0, scheduler.signalCount);
     EXPECT_EQ(1u, clock.waitingTime);
     EXPECT_FALSE(clock.isPending());
-    EXPECT_TRUE(NULL == clock.readFirstPending());
+    EXPECT_TRUE(nullptr == clock.readFirstPending());
     clock.now = 1u;
     EXPECT_TRUE(clock.isPending());
     EXPECT_TRUE(&event.impl == clock.readFirstPending());
@@ -433,7 +436,7 @@ TEST_F(TestClock, startInDelayed)
     EXPECT_EQ(0, scheduler.signalCount);
     EXPECT_EQ(1u, clock.waitingTime);
     EXPECT_FALSE(clock.isPending());
-    EXPECT_TRUE(NULL == clock.readFirstPending());
+    EXPECT_TRUE(nullptr == clock.readFirstPending());
     clock.now = 1u;
     EXPECT_TRUE(clock.isPending());
     EXPECT_TRUE(&event.impl == clock.readFirstPending());
@@ -455,7 +458,7 @@ TEST_F(TestClock, startInDelayedAndAtZero)
     EXPECT_TRUE(clock.isPending());
     EXPECT_TRUE(&event2.impl == clock.readFirstPending());
     EXPECT_FALSE(clock.isPending());
-    EXPECT_TRUE(NULL == clock.readFirstPending());
+    EXPECT_TRUE(nullptr == clock.readFirstPending());
     clock.now = 2u;
     EXPECT_TRUE(clock.isPending());
     EXPECT_TRUE(&event1.impl == clock.readFirstPending());
@@ -482,7 +485,8 @@ TEST_F(TestClock, startTimerCall)
     EXPECT_EQ(1u, clock.waitingTime);
 }
 
-TEST_F(TestClock, notQueuedTwice) {
+TEST_F(TestClock, notQueuedTwice)
+{
     TestEvent event(scheduler);
     clock.startIn(event.impl, 1u);
     clock.startIn(event.impl, 1u);
@@ -494,7 +498,8 @@ TEST_F(TestClock, notQueuedTwice) {
     EXPECT_FALSE(&event.impl == clock.readFirstPending());
 }
 
-TEST_F(TestClock, notQueuedTwiceFixTime) {
+TEST_F(TestClock, notQueuedTwiceFixTime)
+{
     TestEvent event(scheduler);
     clock.startIn(event.impl, 1u);
     clock.startIn(event.impl, 1u);
@@ -523,40 +528,31 @@ TEST_F(TestClock, triggerOnlyOnce)
     EXPECT_TRUE(&event == &(clock.readFirstPending()->parent));
 }
 
-TEST_F(TestClock, getDelay)
+TEST_F(TestClock, getStartTime)
 {
-    // On empty clock queue the is no next gap time
-    EXPECT_EQ(0u, clock.getNextGapTime());
-    // With only one element there is no gap time
+    // On empty clock queue the is no next start time
+    EXPECT_EQ(0u, clock.getNextStartTime());
+    // Only one event in queue start time will be the one of the event
     Tasking::Event event5a(scheduler);
     event5a.trigger(5u); // Time point 5
-    EXPECT_EQ(0u, clock.getNextGapTime());
-    // Also when only elements with the same time are in the clock queue
+    EXPECT_EQ(5u, clock.getNextStartTime());
+    // Adding event with same time will not change the start time
     Tasking::Event event5b(scheduler);
-    event5b.trigger(5u); // Time points 5, 5
-    EXPECT_EQ(0u, clock.getNextGapTime());
-    // Now put in an event after the current heads
-    Tasking::Event event15(scheduler);
-    event15.trigger(15u); // Time points 5, 5, 15
-    EXPECT_EQ(10u, clock.getNextGapTime());
-    // Now put in one time before the equal events
-    Tasking::Event event2(scheduler);
-    event2.trigger(2u); // Time points 2, 5, 5, 15
-    EXPECT_EQ(3u, clock.getNextGapTime());
-    // Behind first block an event
-    Tasking::Event event9(scheduler);
-    event9.trigger(9u); // Time points 2, 5, 5, 9, 15
-    EXPECT_EQ(3u, clock.getNextGapTime());
-    // Now consume the elements step by step
-    clock.now = 15; // All pending, but it make no difference for next gap time
-    clock.readFirstPending(); // Time points 5, 5, 9, 15
-    EXPECT_EQ(4u, clock.getNextGapTime());
-    clock.readFirstPending(); // Time points 5, 9, 15
-    EXPECT_EQ(4u, clock.getNextGapTime());
-    clock.readFirstPending(); // Time points 9, 15
-    EXPECT_EQ(6u, clock.getNextGapTime());
-    clock.readFirstPending(); // Time point 15
-    EXPECT_EQ(0u, clock.getNextGapTime());
-    clock.readFirstPending(); // Empty again
-    EXPECT_EQ(0u, clock.getNextGapTime());
+    event5b.trigger(5u); // Time point 5, 5
+    EXPECT_EQ(5u, clock.getNextStartTime());
+    // Adding later event with same time will not change the start time
+    Tasking::Event event7(scheduler);
+    event7.trigger(7); // Time point 5, 5, 7
+    EXPECT_EQ(5u, clock.getNextStartTime());
+    // Adding earlier event will change start time
+    Tasking::Event event3(scheduler);
+    event3.trigger(3); // Time point 3, 5, 5, 7
+    EXPECT_EQ(3u, clock.getNextStartTime());
+    // Read first pending without reach right time will do nothing.
+    EXPECT_TRUE(nullptr == clock.readFirstPending());
+    EXPECT_EQ(3u, clock.getNextStartTime());
+    // Forward clock
+    clock.now = 4;
+    EXPECT_EQ(5u, clock.getNextStartTime());
+    EXPECT_TRUE(&event3 == &(clock.readFirstPending()->parent));
 }

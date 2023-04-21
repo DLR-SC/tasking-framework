@@ -1,4 +1,4 @@
 [submodule "contrib/outpost-core"]
 	path = contrib/outpost-core
-	url = git@github.com:DLR-RY/outpost-core.git
+	url = https://github.com/DLR-RY/outpost-core.git
 	branch = master

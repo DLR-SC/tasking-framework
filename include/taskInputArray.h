@@ -36,6 +36,13 @@ class InputArray
 {
 public:
     /**
+     * Function to add a boolean function to the array to replace the default Boolean AND expression on all inputs.
+     * The function can request the input states of the input array to formulate the condition to activate the
+     * connected task.
+     */
+    using BooleanFunction = bool (*)(const InputArray&);
+
+    /**
      * Read access to the input at the index position in the array.
      * @param index Index of the element to access.
      */
@@ -75,6 +82,14 @@ public:
      */
     void connectTask(TaskImpl& task);
 
+    /**
+     * Set an alternative condition to replace the default AND condition of all inputs.
+     * If a alternative condition is set the result of the function is used to activate the connected task.
+     * Activated inputs configured as "final" will overrule the result of the alternative function.
+     * @param alternativeCondition Alternative condition for the task activation.
+     */
+    void setCondition(BooleanFunction alternativeCondition);
+
 protected:
     /**
      * Initialize the data of the input array. The constructor should only be used with the specialized template class,
@@ -87,6 +102,9 @@ protected:
 private:
     /// Implementation specific data structure with no access from application level
     InputArrayImpl impl;
+
+    /// Pointer to the alternative condition for a task activation
+    BooleanFunction condition;
 };
 
 /**

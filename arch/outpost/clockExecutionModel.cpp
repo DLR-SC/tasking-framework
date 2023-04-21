@@ -69,7 +69,7 @@ Tasking::ClockExecutionModel::clockTick(outpost::rtos::Timer* timer)
     if (isPending())
     {
         static_cast<SchedulerExecutionModel&>(scheduler).signal();
-        Time nextGapTime = getNextGapTime();
+        Time nextGapTime = getNextStartTime() - getTime();
         if (0u != nextGapTime)
         {
             outpost::time::Milliseconds wakeUpIn(nextGapTime);

@@ -55,7 +55,7 @@ PeriodicTask::PeriodicTask(Tasking::Scheduler& scheduler_) :
     TaskProvider(scheduler_, "PeriodicTask"), // Name will be truncated to 'Peri' because it only use 4 characters
     scheduler(scheduler_) // Get the reference to the clock of the scheduler to access them
 {
-    // Configure the one input of the task to expect one arrival at the input for the activation of the task
+    // Configure the one input of the task to expect one push on related channel for the activation of the task
     inputs[0].configure(1u, false);
 }
 

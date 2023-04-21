@@ -146,10 +146,10 @@ Tasking::TaskImpl::TaskImpl(Scheduler& scheduler, SchedulePolicy::ManagementData
     parent(task),
     m_state(TASK_FINISH),
     inputs(inputArray),
-    nextTaskAtScheduler(NULL),
+    nextTaskAtScheduler(nullptr),
     associatedScheduler(scheduler),
     policyData(&policy),
-    group(NULL)
+    group(nullptr)
 {
     static_cast<ProtectedSchedulerAccess&>(scheduler).getImpl().add(*this);
 }
@@ -207,7 +207,7 @@ void
 Tasking::TaskImpl::finalizeExecution(void)
 {
     // If is part of no group, do a direct reset, else finalize the group.
-    if (group == NULL)
+    if (group == nullptr)
     {
         parent.reset();
     }

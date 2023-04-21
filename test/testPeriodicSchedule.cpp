@@ -23,20 +23,21 @@
 #include <task.h>
 #include <taskEvent.h>
 
-class TestPeriodicSchedule : public ::testing::Test {
+class TestPeriodicSchedule : public ::testing::Test
+{
 public:
-
-    // Count task has to inputs configured with one arrival final.
+    // Count task has to inputs configured with one notification and final.
     class CountTask : public Tasking::TaskProvider<1u, Tasking::SchedulePolicyLifo>
     {
     public:
         unsigned int counter;
-        CountTask(Tasking::Scheduler& scheduler, const char *taskName = "") :
-                        TaskProvider(scheduler, taskName), counter(0u)
+        CountTask(Tasking::Scheduler& scheduler, const char* taskName = "") :
+            TaskProvider(scheduler, taskName), counter(0u)
         {
             inputs[0].configure(1u, true);
         }
-        virtual void execute(void)
+        virtual void
+        execute(void)
         {
             counter++;
         }
@@ -49,7 +50,7 @@ public:
 
     CountTask task;
 
-    TestPeriodicSchedule(void): scheduler(policy), event(scheduler), task(scheduler, "PeriodicScheduleTask")
+    TestPeriodicSchedule(void) : scheduler(policy), event(scheduler), task(scheduler, "PeriodicScheduleTask")
     {
         task.configureInput(0u, event);
     }
@@ -60,7 +61,8 @@ TEST_F(TestPeriodicSchedule, triggerTimeTrigger)
     event.trigger(1u); // Queue event, this shall be undone when periodic trigger is scheduled
     ASSERT_TRUE(event.isTriggered());
 
-    // Configure schedule with period 10 ms and offset of 2 ms. Trigger fire at 6 ms in schedule and trigger the count task.
+    // Configure schedule with period 10 ms and offset of 2 ms. Trigger fire at 6 ms in schedule and trigger the count
+    // task.
     Tasking::PeriodicScheduleTrigger trigger(6u);
     CountTask triggeredTask(scheduler);
     triggeredTask.configureInput(0, trigger);
@@ -194,4 +196,5 @@ TEST_F(TestPeriodicSchedule, manyTimeTriggers)
     EXPECT_EQ(1u, triggeredTask6a.counter);
     EXPECT_EQ(1u, triggeredTask6b.counter);
     EXPECT_EQ(1u, triggeredTask7.counter);
-    EXPECT_EQ(1u, triggeredTask8.counter);}
+    EXPECT_EQ(1u, triggeredTask8.counter);
+}
