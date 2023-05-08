@@ -25,7 +25,7 @@ namespace Tasking
 {
 
 // Forward name declarations
-class TaskImpl;
+struct TaskImpl;
 
 /**
  * Common interface to the scheduler used by the Tasking Framework elements. It is recommended to use the template

@@ -27,7 +27,7 @@ namespace Tasking
 {
 
 // Forward declarations
-class GroupImpl;
+struct GroupImpl;
 class Scheduler;
 
 struct TaskImpl

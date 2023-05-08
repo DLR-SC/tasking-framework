@@ -31,7 +31,7 @@ namespace Tasking
 class Input;
 class Channel;
 class Task;
-class TaskImpl;
+struct TaskImpl;
 
 struct InputImpl
 {

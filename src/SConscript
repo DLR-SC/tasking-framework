@@ -13,7 +13,6 @@ elif envGlobal['PLATFORM'] == 'linux':
 	envGlobal.Append(CXXFLAGS=['-pthread'])
 elif envGlobal['PLATFORM'] == 'outpost':
     envGlobal.Append(CPPPATH=[os.path.abspath('../arch/outpost')])
-    envGlobal.Append(LIBS=['outpost_rtos', 'outpost_time'])
 # TODO Implement cpp11
 # elif envGlobal['PLATFORM'] == 'cpp11':
 #      envGlobal.Append(CPPPATH=[os.path.abspath('../arch/cpp11')])
@@ -27,6 +26,7 @@ elif envGlobal['PLATFORM'] == 'linux':
     files += env.Glob('../arch/linux/*.cpp')
 elif envGlobal['PLATFORM'] == 'outpost':
     files += env.Glob('../arch/outpost/*.cpp')
+    env.Append(LIBS=['outpost_rtos', 'outpost_time'])
 # TODO Implement cpp11 
 # elif envGlobal['PLATFORM'] == 'cpp11':
 #     files += env.Glob('../arch/cpp11/*.cpp')

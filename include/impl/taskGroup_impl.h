@@ -23,7 +23,7 @@ namespace Tasking
 {
 
 class Task;
-class TaskImpl;
+struct TaskImpl;
 
 /**
  * Implementation part of a Group.

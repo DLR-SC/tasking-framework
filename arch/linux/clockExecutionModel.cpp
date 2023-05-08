@@ -78,6 +78,7 @@ Tasking::ClockExecutionModel::ClockExecutionModel(Scheduler& p_scheduler) : Cloc
     // Setting time structure for next wake-up to zero. This will hold clock thread in outer running loop
     wakeUpTime.tv_sec = 0;
     wakeUpTime.tv_nsec = 0;
+    running = false;
 
     // Set up mutex, conditional variable and start thread
     int state = pthread_mutex_init(&m_mutex, nullptr);

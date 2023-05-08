@@ -259,6 +259,11 @@ Tasking::Clock::enqueueHead(Tasking::EventImpl& event)
             }
         }
     }
+    else
+    {
+        // No event in the queue, new event is also tail of queue
+        queueTail = &event;
+    }
     // Prepare next and previous pointer of event to become new head element
     event.next = queueHead;
     event.previous = nullptr;

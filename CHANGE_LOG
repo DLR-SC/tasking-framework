@@ -1,3 +1,33 @@
+----- Start of revision 1.1.1 changes -----
+
+Olaf Maibaum Fri, 21 Apr 2023 14:41:02 +0200
+  [doc]Contributors Fix wrong name
+
+Gabriel Moyano Wed, 19 Apr 2023 13:29:17 +0200
+  src/SConscript: Append outpost libraries after cloning the environment
+
+Christof Efkemann Mon, 3 Apr 2023 10:27:18 +0200
+  initialise member variable
+
+Christof Efkemann Mon, 3 Apr 2023 10:25:29 +0200
+  Use "override" specifier for overriding member function.
+
+Christof Efkemann Mon, 3 Apr 2023 10:23:57 +0200
+  Use "class" and "struct" consistently in forward declarations.
+
+Olaf Maibaum Fri, 3 Mar 2023 14:49:02 +0100
+  [test]Clock enqueeHead_StartIn test
+
+Olaf Maibaum Fri, 3 Mar 2023 13:47:47 +0100
+  [src]Clock Fix queueTail when enqueue in empty list
+
+Olaf Maibaum Fri, 3 Mar 2023 13:30:44 +0100
+  [build]Add cff file to deployment
+
+Olaf Maibaum Fri, 3 Mar 2023 13:27:19 +0100
+  [doc]Update list of contributors
+
+----- End of revision 1.1.1 changes -----
 ----- Start of revision 1.1 changes -----
 
 Olaf Maibaum Fri, 3 Mar 2023 13:30:44 +0100

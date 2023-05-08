@@ -556,3 +556,15 @@ TEST_F(TestClock, getStartTime)
     EXPECT_EQ(5u, clock.getNextStartTime());
     EXPECT_TRUE(&event3 == &(clock.readFirstPending()->parent));
 }
+
+TEST_F(TestClock, StartInAfterEmptyEnqueueHead)
+{
+    TestEvent event1(scheduler, 0u);
+    clock.enqueueHead(event1.impl); // Only 1 in queue
+    TestEvent event2(scheduler, 0u);
+    clock.startIn(event2.impl, 1u); // 1 and 2 in queue.
+    EXPECT_TRUE(&event1.impl == clock.readFirstPending());
+    clock.now = 1;
+    EXPECT_TRUE(&event2.impl == clock.readFirstPending());
+    EXPECT_TRUE(nullptr == clock.readFirstPending());
+}

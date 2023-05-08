@@ -12,3 +12,4 @@
 	* Gabriel Moyano
 	* Lea Jungmann
 	* Arnau, Prat i Sala
+	* Christof Efkemann

@@ -25,7 +25,7 @@ namespace Tasking
 {
 
 // Forward declaration for input and task.
-class InputImpl;
+struct InputImpl;
 class Task;
 
 /**

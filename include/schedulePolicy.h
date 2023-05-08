@@ -22,7 +22,7 @@
 namespace Tasking
 {
 
-class TaskImpl;
+struct TaskImpl;
 
 /**
  * Interface class of a scheduling policy. For the implementation of a new scheduling policy the two structures

@@ -31,7 +31,7 @@ class Clock;
 class Scheduler;
 class Event;
 class PeriodicSchedule;
-class PeriodicScheduleImpl;
+struct PeriodicScheduleImpl;
 
 /**
  * Implementation part of an event

@@ -25,7 +25,7 @@
 namespace Tasking
 {
 
-class EventImpl;
+struct EventImpl;
 // Forward definition of the event
 
 /**

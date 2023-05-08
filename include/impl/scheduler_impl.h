@@ -27,7 +27,7 @@ namespace Tasking
 {
 
 // Forward name declarations
-class TaskImpl;
+struct TaskImpl;
 class Scheduler;
 
 /**

@@ -59,7 +59,7 @@ protected:
      * Start the timer for a new wake up time.
      * @param timeSpan The timer after which the trigger shall start.
      */
-    virtual void startTimer(Time timeSpan);
+    void startTimer(Time timeSpan) override;
 
 private:
     /// Board clock to get the current time
