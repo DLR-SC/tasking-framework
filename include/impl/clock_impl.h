@@ -83,11 +83,13 @@ public:
      *  Enqueue an element to the clock queue. The method search the right position in the queue by the time,
      *  earliest time first. The last enqueued event is triggered first.
      *
+     *  @param currentTime Current timestamp as returned by getTime()
      *  @param event Reference to the element to enqueue
      *
-     *  @return True when the head element is replaced by the enqueued element, else false.
+     *  @return True when the element is the first element in the queue with an activation time that is not in the past,
+     * else false.
      */
-    bool enqueue(EventImpl& event);
+    bool enqueue(Time currentTime, EventImpl& event);
 
     /**
      * Replace directly the head of the clock queue without searching the correct spot. This is done with events
@@ -143,15 +145,6 @@ public:
 
     /// Mutex to protect the clock queue against concurrent access.
     mutable Mutex timeQueueMutex;
-
-    /// Flag to indicate if still in mutex.
-    volatile bool inTimeQueueMutex;
-
-    /// Mutex to protect change of pair timeQueueMutex and inTimeQueueMutex.
-    mutable Mutex timeQueueMutexMutex;
-
-    /// Flag to indicate that a next pointer inside the clock queue was modified
-    volatile bool nextInQueueModified;
 
     /**
      * Pointer to the clock queue head. This event has the earliest absolute wake up time or the same time like an

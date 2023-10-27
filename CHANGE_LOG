@@ -1,3 +1,81 @@
+----- Start of revision 1.1.2 changes -----
+
+Kai Bleeke Tue, 15 Aug 2023 17:29:08 +0200
+  [src] missed event trigger condition
+
+Kai Bleeke Mon, 24 Jul 2023 08:05:10 +0200
+  [src] clock has to be signalled when an event is enqueued to a list that only consists of past events
+
+Kai Bleeke Mon, 7 Aug 2023 12:35:51 +0200
+  [src] use Tasking::MutexGuard in clock.cpp
+
+Kai Bleeke Wed, 26 Jul 2023 13:18:49 +0200
+  [arch] synchronize shutdown on linux
+
+Olaf Maibaum Fri, 21 Jul 2023 16:27:35 +0200
+  [fix]Clock Condition on activation time didn't match comment
+
+Olaf Maibaum Thu, 20 Jul 2023 16:03:50 +0200
+  [src]Clock Remove deadlock in clock queue
+
+Kai Bleeke Tue, 8 Aug 2023 13:44:47 +0200
+  [CI] load clang-format from pip as well
+
+Kai Bleeke Tue, 8 Aug 2023 13:28:13 +0200
+  [CI] use SCons from pip3
+
+Kai Bleeke Mon, 7 Aug 2023 15:02:01 +0200
+  [CI] update scons-build-tools
+
+Kai Bleeke Mon, 7 Aug 2023 14:43:16 +0200
+  [CI] add shell tag to jobs
+
+Bleeke, Kai Mon, 31 Jul 2023 07:13:58 +0000
+  Resolve "Prevent underflows in linux clock implementation"
+
+Olaf Maibaum Wed, 17 May 2023 16:15:23 +0200
+  [src]Clock Reorganize protected access
+
+Olaf Maibaum Wed, 17 May 2023 16:14:55 +0200
+  [src]Scheduler Reorganize protected access
+
+Olaf Maibaum Wed, 17 May 2023 15:49:07 +0200
+  [src]Input Shorten accessor call
+
+Olaf Maibaum Wed, 17 May 2023 15:15:18 +0200
+  [src]Task Shorten accessor call
+
+Olaf Maibaum Wed, 17 May 2023 15:10:53 +0200
+  [src]Channel Reorganize protected access
+
+Olaf Maibaum Wed, 17 May 2023 14:30:29 +0200
+  [src]Task Reorganize protected access
+
+Olaf Maibaum Wed, 17 May 2023 13:17:30 +0200
+  [test]testSchedulerUnitTest Warning on missing override
+
+Olaf Maibaum Mon, 8 May 2023 12:57:12 +0200
+  [doc]Update for github release 1.1.1
+
+Gabriel Moyano Wed, 19 Apr 2023 13:29:17 +0200
+  src/SConscript: Append outpost libraries after cloning the environment
+
+Christof Efkemann Mon, 3 Apr 2023 10:27:18 +0200
+  initialise member variable
+
+Christof Efkemann Mon, 3 Apr 2023 10:25:29 +0200
+  Use "override" specifier for overriding member function.
+
+Christof Efkemann Mon, 3 Apr 2023 10:23:57 +0200
+  Use "class" and "struct" consistently in forward declarations.
+
+Olaf Maibaum Fri, 3 Mar 2023 14:49:02 +0100
+  [test]Clock enqueeHead_StartIn test
+
+Olaf Maibaum Fri, 3 Mar 2023 13:47:47 +0100
+  [src]Clock Fix queueTail when enqueue in empty list
+
+----- End of revision 1.1.2 changes -----
 ----- Start of revision 1.1.1 changes -----
 
 Olaf Maibaum Fri, 21 Apr 2023 14:41:02 +0200

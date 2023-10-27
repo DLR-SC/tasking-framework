@@ -55,7 +55,7 @@ public:
         using Tasking::Channel::push;
 
         virtual void
-        reset(void)
+        reset(void) override
         {
             ++resets;
         }
@@ -66,7 +66,7 @@ public:
             synchActivations = activations;
         }
         virtual void
-        synchronizeEnd(Tasking::Task* task)
+        synchronizeEnd(Tasking::Task* task) override
         {
             endsynchTask = task;
         }

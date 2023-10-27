@@ -133,7 +133,7 @@ public:
             for (int n = 0; n < 3; ++n)
             {
                 events[i] = new TestEvent(scheduler, t);
-                clock.enqueue(events[i]->impl);
+                clock.enqueue(clock.getTime(), events[i]->impl);
                 ++i;
             }
         }
@@ -190,7 +190,7 @@ TEST_F(TestClock, EnqueueHeadRunningCondition)
 TEST_F(TestClock, EnqueueByTimeOneElement)
 {
     TestEvent event1(scheduler, 1u);
-    clock.enqueue(event1.impl);
+    clock.enqueue(clock.getTime(), event1.impl);
     EXPECT_FALSE(clock.isEmtpy());
     EXPECT_FALSE(clock.isPending());
     EXPECT_EQ(1u, clock.getHeadTime());
@@ -200,7 +200,7 @@ TEST_F(TestClock, EnqueueByTimeOneElement)
     EXPECT_FALSE(clock.isPending());
     EXPECT_EQ(0u, clock.getHeadTime());
     TestEvent event2(scheduler, 2u);
-    clock.enqueue(event2.impl);
+    clock.enqueue(clock.getTime(), event2.impl);
     EXPECT_FALSE(clock.isPending());
     clock.now = 2u;
     EXPECT_TRUE(clock.isPending());
@@ -211,21 +211,21 @@ TEST_F(TestClock, EnqueueByTimeOneElement)
 TEST_F(TestClock, EnqueueSeveralElements)
 {
     TestEvent event1a(scheduler, 1u);
-    clock.enqueue(event1a.impl); // Expected queue 1a
+    clock.enqueue(clock.getTime(), event1a.impl); // Expected queue 1a
     TestEvent event2a(scheduler, 2u);
-    clock.enqueue(event2a.impl); // Expected queue 1a, 2a
+    clock.enqueue(clock.getTime(), event2a.impl); // Expected queue 1a, 2a
     TestEvent event2b(scheduler, 2u);
-    clock.enqueue(event2b.impl); // Expected queue 1a, 2a, 2b
+    clock.enqueue(clock.getTime(), event2b.impl); // Expected queue 1a, 2a, 2b
     TestEvent event3a(scheduler, 3u);
-    clock.enqueue(event3a.impl); // Expected queue 1a, 2a, 2b 3
+    clock.enqueue(clock.getTime(), event3a.impl); // Expected queue 1a, 2a, 2b 3
     TestEvent event1b(scheduler, 1u);
-    clock.enqueue(event1b.impl); // Expected queue 1a, 1b, 2a, 2b 3
+    clock.enqueue(clock.getTime(), event1b.impl); // Expected queue 1a, 1b, 2a, 2b 3
     EXPECT_FALSE(clock.isPending());
     TestEvent event0a(scheduler, 0u);
-    clock.enqueue(event0a.impl); // Expected queue 0a, 1a, 1b, 2a, 2b 3
+    clock.enqueue(clock.getTime(), event0a.impl); // Expected queue 0a, 1a, 1b, 2a, 2b 3
     EXPECT_TRUE(clock.isPending());
     TestEvent event0b(scheduler, 0u);
-    clock.enqueue(event0b.impl); // Expected queue 0a, 0b, 1a, 1b, 2a, 2b 3
+    clock.enqueue(clock.getTime(), event0b.impl); // Expected queue 0a, 0b, 1a, 1b, 2a, 2b 3
     EXPECT_TRUE(clock.isPending());
     EXPECT_EQ(0u, clock.getHeadTime());
     EXPECT_TRUE(&event0a.impl == clock.readFirstPending());
@@ -257,7 +257,7 @@ TEST_F(TestClock, EnqueueSeveralElements)
     EXPECT_TRUE(nullptr == clock.readFirstPending());
     EXPECT_EQ(0u, clock.getHeadTime());
     TestEvent event3b(scheduler, 3u);
-    clock.enqueue(event3b.impl);
+    clock.enqueue(clock.getTime(), event3b.impl);
     EXPECT_TRUE(clock.isPending());
     EXPECT_TRUE(&event3b.impl == clock.readFirstPending());
     EXPECT_FALSE(clock.isPending());
@@ -269,10 +269,10 @@ TEST_F(TestClock, dequeueAll)
     TestEvent event1a(scheduler, 1);
     TestEvent event1b(scheduler, 1);
     TestEvent event2(scheduler, 2);
-    clock.enqueue(event0.impl);
-    clock.enqueue(event1a.impl);
-    clock.enqueue(event1b.impl);
-    clock.enqueue(event2.impl);
+    clock.enqueue(clock.getTime(), event0.impl);
+    clock.enqueue(clock.getTime(), event1a.impl);
+    clock.enqueue(clock.getTime(), event1b.impl);
+    clock.enqueue(clock.getTime(), event2.impl);
     EXPECT_TRUE(clock.isPending());
     clock.dequeueAll();
     EXPECT_FALSE(clock.isPending());
@@ -380,7 +380,7 @@ TEST_F(TestClock, dequeueTail)
     ASSERT_TRUE(events[8]->getPrevious() == nullptr);
 
     TestEvent event(scheduler, 2u);
-    clock.enqueue(event.impl);
+    clock.enqueue(clock.getTime(), event.impl);
 
     clock.now = 10;
     for (unsigned int i = 0; i < 3; ++i)

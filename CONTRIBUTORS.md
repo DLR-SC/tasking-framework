@@ -13,3 +13,4 @@
 	* Lea Jungmann
 	* Arnau, Prat i Sala
 	* Christof Efkemann
+	* Kai Bleeke

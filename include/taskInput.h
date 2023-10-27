@@ -26,6 +26,7 @@ namespace Tasking
 
 class Task;
 class Channel;
+struct TaskingAccessor;
 
 /**
  * Manage the activation state of incoming channels to a task. If all task inputs of a task are activated
@@ -36,6 +37,8 @@ class Channel;
  */
 class Input
 {
+    friend TaskingAccessor;
+
 public:
     /**
      * Null initialization of a task input.

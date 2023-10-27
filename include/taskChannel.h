@@ -27,6 +27,7 @@ namespace Tasking
 // Forward declaration for input and task.
 struct InputImpl;
 class Task;
+struct TaskingAccessor;
 
 /**
  * A task channel is the base for a data container to store data and distribute this data to
@@ -46,6 +47,8 @@ class Task;
  */
 class Channel
 {
+    friend TaskingAccessor;
+
 protected:
     /// Identification of the channel. For debugging purposes it should always be the first element of the channel.
     ChannelId m_channelId;

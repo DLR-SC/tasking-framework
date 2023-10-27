@@ -20,15 +20,7 @@
 #include "taskChannel.h"
 #include "task.h"
 
-class UnprotectedChannelAccess : public Tasking::Channel
-{
-public:
-    using Tasking::Channel::associateTo;
-    using Tasking::Channel::deassociate;
-    using Tasking::Channel::reset;
-    using Tasking::Channel::synchronizeEnd;
-    using Tasking::Channel::synchronizeStart;
-};
+#include "accessor.h"
 
 Tasking::Input::Input(void) : impl(*this)
 {
@@ -42,11 +34,11 @@ Tasking::Input::configure(Channel& channel, unsigned int activations, bool final
     // Check if input is associated currently, if it is connect, delete association first
     if (impl.m_channel != nullptr)
     {
-        static_cast<UnprotectedChannelAccess*>(impl.m_channel)->deassociate(impl);
+        TaskingAccessor().deassociate(*impl.m_channel, impl);
     }
     impl.m_channel = &channel;
     configure(activations, final);
-    static_cast<UnprotectedChannelAccess*>(impl.m_channel)->associateTo(impl);
+    TaskingAccessor().associateTo(*impl.m_channel, impl);
 }
 
 //-------------------------------------
@@ -92,7 +84,7 @@ bool
 Tasking::Input::associate(Channel& channel)
 {
     impl.m_channel = &channel;
-    return static_cast<UnprotectedChannelAccess*>(impl.m_channel)->associateTo(impl);
+    return TaskingAccessor().associateTo(*impl.m_channel, impl);
 }
 
 //-------------------------------------
@@ -102,7 +94,7 @@ Tasking::Input::deassociate(void)
 {
     if (impl.m_channel != nullptr)
     {
-        static_cast<UnprotectedChannelAccess*>(impl.m_channel)->deassociate(impl);
+        TaskingAccessor().deassociate(*impl.m_channel, impl);
         impl.m_channel = nullptr;
     }
 }
@@ -123,7 +115,7 @@ Tasking::Input::reset(void)
     // If connected to a channel, than reset the channel
     if (impl.m_channel != nullptr)
     {
-        static_cast<UnprotectedChannelAccess*>(impl.m_channel)->reset();
+        TaskingAccessor().reset(*impl.m_channel);
     }
     // When configured as synchronized, the missed activations has to be overtaken
     if (impl.m_synchron)
@@ -279,8 +271,7 @@ Tasking::Input::synchronizeStart(void)
 {
     if (impl.m_channel != nullptr)
     {
-        static_cast<UnprotectedChannelAccess*>(impl.m_channel)
-                ->synchronizeStart(&impl.m_task->parent, impl.m_notifications);
+        TaskingAccessor().synchronizeStart(*impl.m_channel, &impl.m_task->parent, impl.m_notifications);
     }
 }
 
@@ -291,6 +282,6 @@ Tasking::Input::synchronizeEnd(void)
 {
     if (impl.m_channel != nullptr)
     {
-        static_cast<UnprotectedChannelAccess*>(impl.m_channel)->synchronizeEnd(&impl.m_task->parent);
+        TaskingAccessor().synchronizeEnd(*impl.m_channel, &impl.m_task->parent);
     }
 }

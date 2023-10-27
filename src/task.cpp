@@ -21,18 +21,9 @@
 #include <taskGroup.h>
 #include <scheduler.h>
 
-// Need access to protected elements of scheduler and group. Protection is only valid for application code
-class ProtectedSchedulerAccess : public Tasking::Scheduler
-{
-public:
-    using Tasking::Scheduler::getImpl;
-};
-class ProtectedInputAccess : public Tasking::Input
-{
-public:
-    using Tasking::Input::synchronizeEnd;
-    using Tasking::Input::synchronizeStart;
-};
+#include "accessor.h"
+
+// ================
 
 Tasking::Task::Task(Scheduler& scheduler, SchedulePolicy::ManagementData& policy, InputArray& inputArray,
                     TaskId taskId) :
@@ -106,7 +97,7 @@ Tasking::Task::reset(void)
     if ((impl.m_state == TaskImpl::TASK_PENDING) && impl.inputs.isActivated())
     {
         impl.m_state = TaskImpl::TASK_RUN;
-        static_cast<ProtectedSchedulerAccess&>(impl.associatedScheduler).getImpl().perform(impl);
+        TaskingAccessor().getImpl(impl.associatedScheduler).perform(impl);
     }
     else
     {
@@ -151,7 +142,7 @@ Tasking::TaskImpl::TaskImpl(Scheduler& scheduler, SchedulePolicy::ManagementData
     policyData(&policy),
     group(nullptr)
 {
-    static_cast<ProtectedSchedulerAccess&>(scheduler).getImpl().add(*this);
+    TaskingAccessor().getImpl(scheduler).add(*this);
 }
 
 //-------------------------------------
@@ -184,7 +175,7 @@ Tasking::TaskImpl::activate(void)
                 {
                     // Initiate the execution
                     m_state = TaskImpl::TASK_RUN;
-                    static_cast<ProtectedSchedulerAccess&>(associatedScheduler).getImpl().perform(*this);
+                    TaskingAccessor().getImpl(associatedScheduler).perform(*this);
                 }
             }
         }
@@ -228,7 +219,7 @@ Tasking::TaskImpl::synchronizeStart(void)
 {
     for (unsigned int i = 0; (i < inputs.size()); i++)
     {
-        static_cast<ProtectedInputAccess&>(inputs[i]).synchronizeStart();
+        TaskingAccessor().synchronizeStart(inputs[i]);
     }
 }
 
@@ -239,7 +230,7 @@ Tasking::TaskImpl::synchronizeEnd(void)
 {
     for (unsigned int i = 0; (i < inputs.size()); i++)
     {
-        static_cast<ProtectedInputAccess&>(inputs[i]).synchronizeEnd();
+        TaskingAccessor().synchronizeEnd(inputs[i]);
     }
 }
 

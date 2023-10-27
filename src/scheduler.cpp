@@ -19,18 +19,7 @@
 #include <scheduler.h>
 #include <task.h>
 
-// The scheduler has to access protected methods out of the scope of the application programmer.
-class UnprotectedTaskAccess : public Tasking::Task
-{
-public:
-    using Tasking::Task::execute;
-    using Tasking::Task::initialize;
-};
-class UnprotectedSchedulerAccess : public Tasking::Scheduler
-{
-public:
-    using Tasking::Scheduler::signal;
-};
+#include "accessor.h"
 
 Tasking::Scheduler::Scheduler(SchedulePolicy& schedulePolicy, Clock& clock) : impl(*this, schedulePolicy, clock)
 {
@@ -95,7 +84,7 @@ Tasking::Scheduler::initialize(void)
 {
     for (TaskImpl* task = impl.associatedTasks; task != nullptr; task = task->nextTaskAtScheduler)
     {
-        static_cast<UnprotectedTaskAccess&>(task->parent).initialize();
+        TaskingAccessor().initialize(task->parent);
     }
 }
 
@@ -126,7 +115,7 @@ Tasking::SchedulerImpl::perform(Tasking::TaskImpl& task)
     {
         // Queue task for execution and signal scheduler execution model
         policy.queue(task);
-        static_cast<UnprotectedSchedulerAccess&>(parent).signal();
+        TaskingAccessor().signal(parent);
     }
 }
 
@@ -152,7 +141,7 @@ Tasking::SchedulerImpl::execute(Tasking::TaskImpl& task) const
     synchronizationMutex.enter();
     uptask->synchronizeStart();
     synchronizationMutex.leave();
-    static_cast<UnprotectedTaskAccess&>(uptask->parent).execute();
+    TaskingAccessor().execute(uptask->parent);
     synchronizationMutex.enter();
     uptask->synchronizeEnd();
     uptask->finalizeExecution();

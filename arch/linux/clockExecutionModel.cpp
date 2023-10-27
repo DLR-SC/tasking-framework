@@ -17,7 +17,9 @@
  */
 
 #include <cassert>
+#include <pthread.h>
 #include "schedulerExecutionModel.h"
+#include "taskTypes.h"
 
 namespace Tasking
 {
@@ -35,27 +37,40 @@ extern "C"
         // Start main loop of thread. Thread will stop if the values of the time spec are both 0.
         while (clock->running)
         {
+            // Adjust wake-up time for next sleep
+            // On linux, this method needs to be protected from concurrent access by the scheduler/executors
+            clock->timeQueueMutex.enter();
+            Tasking::Time nextStartTime = clock->getNextStartTime();
+            clock->timeQueueMutex.leave();
 
-            // Waiting for signal from clock
-            pthread_cond_wait(&clock->m_cond, &clock->m_mutex);
-
-            // Keep in this loop so long a next wake-up time exists
-            while (clock->running && !clock->isEmtpy())
+            // The queue is empty or all events are in the past, sleep until notification for a new event
+            if (nextStartTime == 0)
             {
-                // Going to wait until wake up time reached or a signal from the clock comes
-                pthread_cond_timedwait(&(clock->m_cond), &(clock->m_mutex), &(clock->wakeUpTime));
-                // There are several reasons for the wake-up.
-                // Do only some actions when an event is pending, else start next clock thread cycle in inner or outer
-                // loop
-                if (clock->isPending())
+                // Waiting for signal from clock
+                pthread_cond_wait(&clock->m_cond, &clock->m_mutex);
+            }
+            // If we found a wakeup time, sleep until the next wakeup time
+            else
+            {
+                // time can pass here
+                Time currentTime = clock->getTime();
+                // if nextStartTime is still greater than current time, we go to sleep
+                // otherwise, time has passed, clock->isPending() will signal and we go to the next cycle
+                if (nextStartTime > currentTime)
                 {
-                    // Signal the scheduler, it will perform pending events
-                    static_cast<SchedulerExecutionModel*>(&(clock->scheduler))->signal();
-                    // Adjust wake-up time for next sleep
-                    Tasking::Time timeSpan = clock->getNextStartTime() - clock->getTime();
-                    clock->computeAbsoluteWakeUpTime(timeSpan);
+                    clock->computeAbsoluteWakeUpTime(nextStartTime - currentTime);
+                    // Going to wait until wake up time reached or a signal from the clock comes
+                    pthread_cond_timedwait(&(clock->m_cond), &(clock->m_mutex), &(clock->wakeUpTime));
                 }
-            } // end of loop over not empty clock event list
+            }
+
+            // There are several reasons for the wake-up.
+            // Do only some actions when an event is pending, else start next clock thread cycle
+            if (clock->isPending())
+            {
+                // Signal the scheduler, it will perform pending events
+                static_cast<SchedulerExecutionModel*>(&(clock->scheduler))->signal();
+            }
         } // end of loop over waiting on empty clock list
 
         // Unlocking the mutex. It's needed never again.
@@ -105,7 +120,9 @@ Tasking::ClockExecutionModel::ClockExecutionModel(Scheduler& p_scheduler) : Cloc
 Tasking::ClockExecutionModel::~ClockExecutionModel(void)
 {
     // Terminating thread
+    pthread_mutex_lock(&m_mutex);
     running = false;
+    pthread_mutex_unlock(&m_mutex);
     // Wake up thread
     pthread_cond_signal(&m_cond);
     // Wait on termination of the thread

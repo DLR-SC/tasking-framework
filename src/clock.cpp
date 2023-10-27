@@ -19,20 +19,12 @@
 #include <impl/clock_impl.h>
 #include <scheduler.h>
 #include <taskEvent.h>
+#include <taskUtils.h>
 
-class ProtectedSchedulerAccess : public Tasking::Scheduler
-{
-public:
-    using Tasking::Scheduler::signal;
-};
+#include "accessor.h"
 
 Tasking::Clock::Clock(Tasking::Scheduler& pScheduler) :
-    scheduler(pScheduler),
-    inTimeQueueMutex(false),
-    nextInQueueModified(false),
-    queueHead(nullptr),
-    queueTail(nullptr),
-    nonePendingHead(nullptr)
+    scheduler(pScheduler), queueHead(nullptr), queueTail(nullptr), nonePendingHead(nullptr)
 {
 }
 
@@ -54,46 +46,36 @@ Tasking::Clock::startAt(EventImpl& event, const Time time)
     int64_t delay = 0u;
 
     // Modification on a still queued event can corrupt queuing.
-    timeQueueMutexMutex.enter();
-    timeQueueMutex.enter();
-    inTimeQueueMutex = true;
-    timeQueueMutexMutex.leave();
-
-    // Queue only if not queued yet.
-    if (!event.queued)
     {
-        // Set the correct next activation time
-        event.nextActivation_ms = time;
-        // Compute the new delay time for the timer. Usage of integer to handle past times implicit.
-        delay = static_cast<int64_t>(time) - static_cast<int64_t>(getTime());
-
-        // Take over into clock queue when delay is at least one millisecond, else schedule event
-        if (delay > 0u)
+        MutexGuard guard(timeQueueMutex);
+        // Queue only if not queued yet.
+        if (!event.queued)
         {
-            // Operations on the queues is concurrent to clock thread
-            // Enqueue in active list
-            if (enqueue(event))
+            // Set the correct next activation time
+            event.nextActivation_ms = time;
+            // Compute the new delay time for the timer. Usage of integer to handle past times implicit.
+            Time currentTime = getTime();
+            delay = static_cast<int64_t>(time) - static_cast<int64_t>(currentTime);
+
+            // Take over into clock queue when delay is at least one millisecond, else schedule event
+            if (delay > 0u)
             {
-                // And start it when enqueue replace the head element outside of protected region.
-                shouldStartTimer = true;
+                // Enqueue in active list and start timer when event is the first future event
+                shouldStartTimer = enqueue(currentTime, event);
+            }
+            else
+            {
+                // Start event immediately or start point where in the past.
+                enqueueHead(event);
+                shouldSignal = true;
             }
         }
-        else
-        {
-            enqueueHead(event);
-            shouldSignal = true;
-        }
     }
-
-    timeQueueMutexMutex.enter();
-    inTimeQueueMutex = false;
-    timeQueueMutex.leave();
-    timeQueueMutexMutex.leave();
 
     // If necessary, signal the scheduler to execute handle methods of pending events
     if (shouldSignal)
     {
-        static_cast<ProtectedSchedulerAccess*>(&scheduler)->signal();
+        TaskingAccessor().signal(scheduler);
     }
     // If necessary, start the timer because wake up time has changed.
     // Condition (shouldStartTimer && (delay > 0)) is always fulfilled
@@ -119,28 +101,22 @@ Tasking::Clock::startIn(EventImpl& event, const Time time)
         bool shouldSignal = false;
 
         // Modification on a still queued event can corrupt queuing.
-        timeQueueMutexMutex.enter();
-        timeQueueMutex.enter();
-        inTimeQueueMutex = true;
-        timeQueueMutexMutex.leave();
-
-        // Only modify and enqueued event when it is not queued yet.
-        if (!event.queued)
         {
-            event.nextActivation_ms = getTime();
-            enqueueHead(event);
-            // After leaving protected area signal queuing.
-            shouldSignal = true;
-        }
+            MutexGuard guard(timeQueueMutex);
 
-        timeQueueMutexMutex.enter();
-        inTimeQueueMutex = false;
-        timeQueueMutex.leave();
-        timeQueueMutexMutex.leave();
+            // Only modify and enqueued event when it is not queued yet.
+            if (!event.queued)
+            {
+                event.nextActivation_ms = getTime();
+                enqueueHead(event);
+                // After leaving protected area signal queuing.
+                shouldSignal = true;
+            }
+        }
 
         if (shouldSignal)
         {
-            static_cast<ProtectedSchedulerAccess*>(&scheduler)->signal();
+            TaskingAccessor().signal(scheduler);
         }
     }
 }
@@ -148,18 +124,18 @@ Tasking::Clock::startIn(EventImpl& event, const Time time)
 //-------------------------------------
 
 bool
-Tasking::Clock::enqueue(EventImpl& event)
+Tasking::Clock::enqueue(Time currentTime, EventImpl& event)
 {
     // Only called by startAt, so always inside protected area of timeQueueMutex
 
-    bool headReplaced = false;
+    bool firstFutureEvent = false;
 
     event.queued = true;
     event.next = nullptr;
     if (queueHead == nullptr)
     {
         // Nothing in the queue
-        headReplaced = true;
+        firstFutureEvent = true;
         event.previous = nullptr;
         queueHead = &event;
         queueTail = &event;
@@ -179,7 +155,7 @@ Tasking::Clock::enqueue(EventImpl& event)
         if (previousEvent == nullptr)
         {
             // Replace head because we found the first element in the queue. All other times in queue are in the future
-            headReplaced = true;
+            firstFutureEvent = true;
             // All elements at the head with the same time has at previous a nil pointer
             for (EventImpl* hasSameTime = queueHead; (hasSameTime != nullptr) && (hasSameTime->previous == nullptr);
                  hasSameTime = hasSameTime->next)
@@ -206,11 +182,15 @@ Tasking::Clock::enqueue(EventImpl& event)
             else
             {
                 event.previous = previousEvent;
+                // if the previous event is not in the future, we are the first future event
+                if (previousEvent->nextActivation_ms <= currentTime)
+                {
+                    firstFutureEvent = true;
+                }
             }
             // We now are between the found element and its next element
             event.next = previousEvent->next;
             previousEvent->next = &event;
-            nextInQueueModified = true;
             // Check if none pending event is the next one it has to be corrected
             if (event.next == nonePendingHead)
             {
@@ -235,7 +215,8 @@ Tasking::Clock::enqueue(EventImpl& event)
             }
         }
     }
-    return headReplaced;
+
+    return firstFutureEvent;
 }
 
 //-------------------------------------
@@ -276,10 +257,12 @@ Tasking::Clock::enqueueHead(Tasking::EventImpl& event)
 void
 Tasking::Clock::dequeueAll(void)
 {
+    // Enter critical section to modify clock queue
+    MutexGuard guard(timeQueueMutex);
+
     // No further event will fire so none pending head will not valid anymore
     nonePendingHead = nullptr;
 
-    timeQueueMutex.enter();
     // Reset pointers of all events in queue
     EventImpl* event = queueHead;
     while (event != nullptr)
@@ -287,14 +270,12 @@ Tasking::Clock::dequeueAll(void)
         EventImpl* next = event->next;
         event->queued = false;
         event->next = nullptr;
-        nextInQueueModified = true;
         event->previous = nullptr;
         event = next;
     }
     // Clear head and tail
     queueHead = nullptr;
     queueTail = nullptr;
-    timeQueueMutex.leave();
 }
 
 //-------------------------------------
@@ -302,24 +283,13 @@ Tasking::Clock::dequeueAll(void)
 void
 Tasking::Clock::dequeue(Tasking::EventImpl& event)
 {
+    MutexGuard guard(timeQueueMutex);
+
     // If element is the first none pending event the hone pending head need replaced
     if (&event == nonePendingHead)
     {
         nonePendingHead = event.next;
     }
-
-    // Flag to indicate if mutex was entered by this method
-    bool enterMutex = false;
-
-    // Enter protected area of time queue if not in currently
-    timeQueueMutexMutex.enter();
-    if (!inTimeQueueMutex)
-    {
-        timeQueueMutex.enter();
-        enterMutex = true;
-    }
-    inTimeQueueMutex = true;
-    timeQueueMutexMutex.leave();
 
     // If event queue is empty, do nothing
     if (queueHead != nullptr)
@@ -365,7 +335,6 @@ Tasking::Clock::dequeue(Tasking::EventImpl& event)
                 {
                     // Current is inside queue, next pointer of the previous element must corrected
                     previous->next = current->next;
-                    nextInQueueModified = true;
                 }
                 if (current->nextActivation_ms != current->next->nextActivation_ms)
                 {
@@ -384,15 +353,6 @@ Tasking::Clock::dequeue(Tasking::EventImpl& event)
     event.queued = false; // Mark as no longer queued
     event.next = nullptr;
     event.previous = nullptr;
-
-    // Leave protected area if it was entered by this method
-    timeQueueMutexMutex.enter();
-    if (enterMutex)
-    {
-        inTimeQueueMutex = false;
-        timeQueueMutex.leave();
-    }
-    timeQueueMutexMutex.leave();
 }
 
 //-------------------------------------
@@ -400,6 +360,7 @@ Tasking::Clock::dequeue(Tasking::EventImpl& event)
 bool
 Tasking::Clock::isEmtpy(void) const
 {
+    MutexGuard guard(timeQueueMutex);
     return (queueHead == nullptr);
 }
 
@@ -408,13 +369,12 @@ Tasking::Clock::isEmtpy(void) const
 bool
 Tasking::Clock::isPending(void) const
 {
-    timeQueueMutex.enter();
+    MutexGuard guard(timeQueueMutex);
     bool pends = (queueHead != nullptr);
     if (pends)
     {
         pends = (queueHead->nextActivation_ms <= getTime());
     }
-    timeQueueMutex.leave();
     return pends;
 }
 
@@ -426,7 +386,7 @@ Tasking::Clock::readFirstPending(void)
     EventImpl* result = nullptr;
 
     // Working on clock queue is critical
-    timeQueueMutex.enter();
+    MutexGuard guard(timeQueueMutex);
     // Only remove when one is pending.
     if ((queueHead != nullptr) && (queueHead->nextActivation_ms <= getTime()))
     {
@@ -463,7 +423,6 @@ Tasking::Clock::readFirstPending(void)
             }
         }
     }
-    timeQueueMutex.leave();
 
     return result;
 }
@@ -477,39 +436,26 @@ Tasking::Clock::getNextStartTime(void)
     Time currentTime = getTime();
     EventImpl* searchEvent = nullptr;
 
-    // Going into loop to restart search when the clock queue has modified in between.
-    nextInQueueModified = true;
-    while (nextInQueueModified)
+    // Search first event in the future. Start with the last one found by getNextStartTime.
+    searchEvent = nonePendingHead;
+    if (searchEvent == nullptr)
     {
-        // So long it is not set to true by modify the clock queue, stop search if found.
-        nextInQueueModified = false;
-
-        // Search first event in the future. Start with the last one found by getNextStartTime.
-        searchEvent = nonePendingHead;
-        if (searchEvent == nullptr)
+        searchEvent = queueHead;
+    }
+    // Search go until end of queue or when a new start time is found
+    while ((searchEvent != nullptr) && (nextStartTime == 0u))
+    {
+        // Is search event pending in the past or now
+        if (searchEvent->nextActivation_ms <= currentTime)
         {
-            searchEvent = queueHead;
+            // Is in past or now, check the next one
+            searchEvent = searchEvent->next;
+            // Before utilize search event it check for queue modification
         }
-        // Search go until end of queue or when a new start time is found
-        while ((searchEvent != nullptr) && (nextStartTime == 0u))
+        else
         {
-            // Is search event pending in the past
-            if (searchEvent->nextActivation_ms < currentTime)
-            {
-                // Is in past or now, check the next one
-                searchEvent = searchEvent->next;
-                // Before utilize search event it check for queue modification
-                if (nextInQueueModified)
-                {
-                    // Queue is modified. So, don't trust order of next and restart search by going to outer loop.
-                    searchEvent = nullptr;
-                }
-            }
-            else
-            {
-                // Search event will start in the future, next wake up time in queue found
-                nextStartTime = searchEvent->nextActivation_ms;
-            }
+            // Search event will start in the future, next wake up time in queue found
+            nextStartTime = searchEvent->nextActivation_ms;
         }
     }
     // Mark for next search the starting point in queue.

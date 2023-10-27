@@ -23,17 +23,7 @@
 #include <scheduler.h>
 #include <impl/clock_impl.h>
 
-// Implementation of Event need access to clock methods which are protected against application programmer
-class UnprotectedChannelAccess : public Tasking::Event
-{
-public:
-    using Tasking::Event::push;
-};
-class UnprotectedSchedulerAccess : public Tasking::Scheduler
-{
-public:
-    using Tasking::Scheduler::getImpl;
-};
+#include "accessor.h"
 
 Tasking::Event::Event(Scheduler& scheduler, ChannelId eventId) : Channel(eventId), impl(*this, scheduler)
 {
@@ -255,7 +245,7 @@ Tasking::EventImpl::EventImpl(Event& event, Scheduler& scheduler) :
     period_ms(0),
     nextActivation_ms(0),
     periodicSchedule(nullptr),
-    clock(static_cast<UnprotectedSchedulerAccess&>(scheduler).getImpl().clock),
+    clock(TaskingAccessor().getImpl(scheduler).clock),
     next(nullptr),
     previous(nullptr),
     mutexLock(false)
@@ -288,7 +278,8 @@ Tasking::EventImpl::handle(void)
     if (parent.shallFire())
     {
         parent.onFire();
-        static_cast<UnprotectedChannelAccess&>(parent).push();
+
+        TaskingAccessor().push(parent);
     }
 }
 

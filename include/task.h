@@ -27,6 +27,8 @@
 namespace Tasking
 {
 
+struct TaskingAccessor;
+
 /**
  * A task performs a single execution if all inputs of the input array are activated or one input
  * marked as final is activated. To implement the body of the task, the method execute has
@@ -62,6 +64,8 @@ namespace Tasking
  */
 class Task
 {
+    friend TaskingAccessor;
+
 protected:
     /**
      * The identification of the task. It should always mapped to the first data member to find the
