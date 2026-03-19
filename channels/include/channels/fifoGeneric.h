@@ -63,7 +63,7 @@ public:
     /**
      * Reserve a data item provided by the FIFO stack.
      *
-     * @result Pointer to a data item. When the FIFO stack has no more free memory it delivers a NULL pointer.
+     * @result Pointer to a data item. When the FIFO stack has no more free memory it delivers nullptr.
      */
     void* allocate(void);
 

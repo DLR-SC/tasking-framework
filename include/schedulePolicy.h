@@ -69,8 +69,8 @@ public:
     /**
      * Request and remove the next task in the scheduling order. An implementation of a scheduling policy has to provide
      * this method. The delivered task will switch from state pending to run.
-     * @return Pointer to the next task in the order of the scheduling policy. If no pending task is available, a NULL
-     * pointer is returned.
+     * @return Pointer to the next task in the order of the scheduling policy. If no pending task is available, nullptr
+     * is returned.
      */
     virtual Tasking::TaskImpl* nextTask(void) = 0;
 };

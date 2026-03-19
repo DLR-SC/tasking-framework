@@ -1,3 +1,27 @@
+----- Start of revision 1.2 changes -----
+
+Maibaum, Olaf Tue, 17 Feb 2026 09:56:25 +0000
+  Resolve "Slot based priority policy"
+
+Gabriel Moyano Wed, 3 Sep 2025 17:32:08 +0200
+  channels: Add SignalChannel, an empty channel for triggering inputs without sharing data
+
+Gabriel Moyano Wed, 16 Jul 2025 12:23:16 +0200
+  [outpost] Change to relative URLs
+
+Olaf Maibaum Mon, 12 Feb 2024 11:05:29 +0100
+  [fix]nullptr instead of NULL in C++ code
+
+Kai Bleeke Wed, 17 Jan 2024 10:26:10 +0100
+  [arch/outpost] add cmake build script for outpost dependencies
+
+Kai Bleeke Thu, 18 Jan 2024 15:18:13 +0100
+  [arch/oupost] synchronize getNextStartTime call
+
+Kai Bleeke Thu, 18 Jan 2024 10:37:41 +0100
+  [arch/outpost] prevent underflow in clock
+
+----- End of revision 1.2 changes -----
 ----- Start of revision 1.1.2 changes -----
 
 Kai Bleeke Tue, 15 Aug 2023 17:29:08 +0200

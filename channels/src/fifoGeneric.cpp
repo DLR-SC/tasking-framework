@@ -565,7 +565,7 @@ FifoGeneric::synchronize(const Tasking::Task* task, const unsigned int volume)
 
                     // Check if the bit in the reader bit mask was already cleared -> element was already consumed by
                     // the reader follow the chain to the first not set bit
-                    while (/*(reader->fifo_first != NULL) && */ (
+                    while (/*(reader->fifo_first != nullptr) && */ (
                             (reader->fifo_first->expectedReadsBitMask & reader->readerId) == 0))
                     {
                         reader->fifo_first = reader->fifo_first->next;

@@ -54,8 +54,7 @@ public:
 
     /**
      * Request and remove the next task in LIFO order.
-     * @return Pointer to the next task following the LIFO order. If no task is available a NULL
-     * pointer is returned.
+     * @return Pointer to the next task following the LIFO order. If no task is available nullptr is returned.
      */
     TaskImpl* nextTask(void) override;
 

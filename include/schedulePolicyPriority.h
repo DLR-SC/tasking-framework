@@ -72,8 +72,7 @@ public:
 
     /**
      * Request and remove the next task according to the scheduling policy.
-     * @return Pointer to the next task with the highest priority. If no task is available a NULL
-     * pointer is returned.
+     * @return Pointer to the next task with the highest priority. If no task is available nullptr is returned.
      */
     TaskImpl* nextTask(void) override;
 

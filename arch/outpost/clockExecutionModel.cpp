@@ -66,23 +66,28 @@ Tasking::ClockExecutionModel::clockTick(outpost::rtos::Timer* timer)
 {
     // Input variable timer should equal to m_timer, but interface need it in that way.
     // Is a event is pending, signal
+
+    timeQueueMutex.enter();
+    Time nextStartTime = getNextStartTime();
+    timeQueueMutex.leave();
+
+    // time can pass between these calls
+    Time currentTime = getTime();
+
+    // We have to prevent underflows by checking if the nextStartTime is still in the future
+    // In the case of nextStartTime == 0, there is no future event and we don't set the timer
+    if (nextStartTime != 0 && nextStartTime > currentTime)
+    {
+        Time nextGapTime = nextStartTime - currentTime;
+        outpost::time::Milliseconds wakeupIn(nextGapTime);
+        timer->start(wakeupIn);
+    }
+
+    // tell the scheduler about the pending event
+    // If time has passed so that nextStartTime is now or in the past, isPending() will be true and the event will be
+    // signaled
     if (isPending())
     {
         static_cast<SchedulerExecutionModel&>(scheduler).signal();
-        Time nextGapTime = getNextStartTime() - getTime();
-        if (0u != nextGapTime)
-        {
-            outpost::time::Milliseconds wakeUpIn(nextGapTime);
-            timer->start(wakeUpIn);
-        }
-    }
-    else
-    {
-        if (!isEmtpy())
-        {
-            outpost::time::SpacecraftElapsedTime nextStartTime =
-                    m_zeroTime + outpost::time::Milliseconds(getHeadTime());
-            timer->start(nextStartTime - boardClock.now());
-        }
     }
 }

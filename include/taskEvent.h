@@ -34,7 +34,10 @@ class PeriodicSchedule;
  * The implementation specializes the class Channel with timing functionalities. An application programmer can
  * specialize the task event by overriding the two methods shallFire and onFire with own functionalities.
  *
+ * In case you want to trigger an input with no timing constraint, use SignalChannel.
+ *
  * @see TaskChannel
+ * @see SignalChannel
  */
 class Event : public Channel
 {

@@ -19,13 +19,13 @@
 #include <schedulePolicyLifo.h>
 #include <task.h>
 
-Tasking::SchedulePolicyLifo::ManagementData::ManagementData(void) : next(NULL)
+Tasking::SchedulePolicyLifo::ManagementData::ManagementData(void) : next(nullptr)
 {
 }
 
 // ----------------
 
-Tasking::SchedulePolicyLifo::SchedulePolicyLifo(void) : head(NULL)
+Tasking::SchedulePolicyLifo::SchedulePolicyLifo(void) : head(nullptr)
 {
 }
 
@@ -37,7 +37,7 @@ Tasking::SchedulePolicyLifo::queue(Tasking::TaskImpl& task)
     bool isEmpty = true;
     queueMutex.enter();
     // If not empty the next element copy head to new element and then replace head by new one
-    if (head != NULL)
+    if (head != nullptr)
     {
         isEmpty = false;
         static_cast<ManagementData*>(task.policyData)->next = head;
@@ -54,7 +54,7 @@ Tasking::SchedulePolicyLifo::nextTask(void)
 {
     queueMutex.enter();
     TaskImpl* next = head;
-    if (NULL != head)
+    if (nullptr != head)
     {
         head = static_cast<ManagementData*>(head->policyData)->next;
     }
